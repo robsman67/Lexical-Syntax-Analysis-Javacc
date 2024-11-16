@@ -1,0 +1,8 @@
+Create a file with our rule.
+
+JavaCC will then generate everything.
+
+Fonction run qui interprete ligne par ligne quand ds l'interface graphique on met step
+puis le print
+
+Arbre avec des noeuds, recuperer les elements et executer la semantique

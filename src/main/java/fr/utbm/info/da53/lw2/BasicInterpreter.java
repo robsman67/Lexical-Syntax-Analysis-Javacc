@@ -18,20 +18,14 @@
  */
 package fr.utbm.info.da53.lw2;
 
-import java.io.File;
-import java.util.SortedMap;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
-import fr.utbm.info.da53.lw2.context.DebugInterpreter;
-import fr.utbm.info.da53.lw2.context.Interpreter;
-import fr.utbm.info.da53.lw2.context.LineBasedInterpreter;
-import fr.utbm.info.da53.lw2.context.Statement;
-import fr.utbm.info.da53.lw2.error.ErrorRepository;
-import fr.utbm.info.da53.lw2.error.InterpreterException;
-import fr.utbm.info.da53.lw2.error.LoggableException;
-//import fr.utbm.info.da53.lw2.parser.BasicParser;
-import fr.utbm.info.da53.lw2.parser.*;
-//import fr.utbm.info.da53.lw2.parser.BasicParser.java;
-import fr.utbm.info.da53.lw2.ui.InterpreterDialog;
+import fr.utbm.info.da53.lw2.parser.BasicParser;
+import fr.utbm.info.da53.lw2.parser.ParseException;
+
 
 /**
  * Interpreter of BASIC.
@@ -45,6 +39,36 @@ public class BasicInterpreter {
 	 * 
 	 * @param args
 	 */
+
+ public static void main(String[] args) throws ParseException, IOException {
+        // Check if the user has provided a file argument
+        if (args.length > 0) {
+            // Parse from a file
+            FileInputStream fileInputStream = new FileInputStream(args[0]);
+            InputStreamReader reader = new InputStreamReader(fileInputStream);
+            BufferedReader br = new BufferedReader(reader);
+
+            // Initialize the parser with input from the file
+        	BasicParser parser = new BasicParser(br);
+            parser.start(); // Start parsing the input file
+
+            System.out.println("Parsing completed successfully!");
+
+            br.close(); // Don't forget to close the file reader
+        } else {
+            // Default: Read input from the console (System.in)
+            BasicParser parser = new BasicParser(System.in);
+            parser.start(); // Start parsing from console input
+
+            System.out.println("Parsing completed successfully!");
+        }
+    }
+
+
+	/*
+	
+	Code to excute !!
+
 	public static void main(String args[]) {
 		BasicParser parser;
 		String filename;
@@ -92,5 +116,7 @@ public class BasicInterpreter {
 		InterpreterDialog dialog = new InterpreterDialog(filename, debugContext, !ErrorRepository.hasError());
 		dialog.setVisible(true);
 	}
+
+	*/
 
 }

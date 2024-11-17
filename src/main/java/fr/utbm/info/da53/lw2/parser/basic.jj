@@ -1,25 +1,81 @@
+options {
+  IGNORE_CASE = true;
+  STATIC = false;
+}
+
 PARSER_BEGIN(BasicParser)
 
+package fr.utbm.info.da53.lw2.parser;
+
+
 public class BasicParser {
-    public static void main(String[] args) {
-        try {
-            new BasicParser(new java.io.StringReader(args[0])).S();
-            System.out.println("Syntax is okay");
-        } catch (Throwable e) {
-            // Catching Throwable is ugly but JavaCC throws Error objects!
-            System.out.println("Syntax check failed: " + e.getMessage());
-        }
-    }
+
 }
 
 PARSER_END(BasicParser)
 
-SKIP:  { " " | "\t" | "\n" | "\r"                    }
-TOKEN: { "(" | ")" | "+" | "*" | <NUM: (["0"-"9"])+> }
+//The skip Token with the comment token
 
-void S(): {} { E() <EOF>           }
-void E(): {} { T() ("+" T())*      }
-void T(): {} { F() ("*" F())*      }
-void F(): {} { <NUM> | "(" E() ")" }
+SKIP:  { " " | "\t" | "\r" | <"REM" ((" "|"\t")(~["\n","\r"])*)? ("\n" | "\r" | "\r\n" | "\n\r")> }
+
+
+// Keyword Token
+
+TOKEN :
+{
+	< CR: "\n" >
+    | < PRINT : "print">
+    | < EQ : "=" >
+    | < MATH : "+"|"-"|"/"|"*" >
+    | < STRING: "\"" (~["\""])* "\"" >
+    | < NUMBER : (["0"-"9"])+ (("." (["0"-"9"])+))?>
+    | < ID : ["a"-"z","A"-"Z"] ([ "a"-"z", "A"-"Z", "0"-"9" ])* > // doesn't allow to start with a number
+
+}
+
+
+void start() :
+{}
+{
+    ( statement() )* <EOF>  // One or more statements, then end of file
+}
+
+void statement() :
+{}
+{
+    declaration() | assignment() | printStatement()
+}
+
+void declaration() :
+{}
+{
+    <PRINT> <ID> <EQ> <STRING>  // A declaration is "print" <ID> "=" <STRING>
+    {
+        Token id = getToken(1);    // Get the identifier
+        String strValue = token.image; // Get the string value
+        System.out.println("Declared " + id.image + " with value " + strValue);
+    }
+}
+
+void assignment() :
+{}
+{
+    <ID> <EQ> <STRING>  // An assignment is <ID> "=" <STRING>
+    {
+        Token id = getToken(0);    // Get the identifier
+        System.out.println("Assigned value to " + id.image);
+    }
+}
+
+void printStatement() :
+{}
+{
+    <PRINT> <ID>  // A print statement is "print" <ID>
+    {
+        Token id = getToken(1);    // Get the identifier
+        System.out.println("Print statement for: " + id.image);
+    }
+}
+
 
 

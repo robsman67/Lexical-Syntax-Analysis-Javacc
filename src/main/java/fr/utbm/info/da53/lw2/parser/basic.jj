@@ -1,14 +1,29 @@
+/*
 options {
   IGNORE_CASE = true;
   STATIC = false;
-}
+} 
+*/
 
 PARSER_BEGIN(BasicParser)
 
 package fr.utbm.info.da53.lw2.parser;
+import java.io.StringReader;
+
 
 
 public class BasicParser {
+    String testChecker;
+
+    public BasicParser() {
+    }
+
+    public static void parse(String input) throws ParseException {
+        BasicParser parser = new BasicParser(new StringReader(input));
+        parser.S(); // Start parsing from the grammar's start symbol
+        System.out.println("Syntax is correct!");
+    }
+
 
 }
 
@@ -26,56 +41,15 @@ TOKEN :
 	< CR: "\n" >
     | < PRINT : "print">
     | < EQ : "=" >
-    | < MATH : "+"|"-"|"/"|"*" >
+    | < ADD : "+"|"-" > // lower priority
+    | < MUL : "/"|"*" > // higher priority
     | < STRING: "\"" (~["\""])* "\"" >
-    | < NUMBER : (["0"-"9"])+ (("." (["0"-"9"])+))?>
+    | < NUMBER : (["0"-"9"])+ ("." (["0"-"9"])+)? > 
     | < ID : ["a"-"z","A"-"Z"] ([ "a"-"z", "A"-"Z", "0"-"9" ])* > // doesn't allow to start with a number
 
 }
 
-
-void start() :
-{}
-{
-    ( statement() )* <EOF>  // One or more statements, then end of file
-}
-
-void statement() :
-{}
-{
-    declaration() | assignment() | printStatement()
-}
-
-void declaration() :
-{}
-{
-    <PRINT> <ID> <EQ> <STRING>  // A declaration is "print" <ID> "=" <STRING>
-    {
-        Token id = getToken(1);    // Get the identifier
-        String strValue = token.image; // Get the string value
-        System.out.println("Declared " + id.image + " with value " + strValue);
-    }
-}
-
-void assignment() :
-{}
-{
-    <ID> <EQ> <STRING>  // An assignment is <ID> "=" <STRING>
-    {
-        Token id = getToken(0);    // Get the identifier
-        System.out.println("Assigned value to " + id.image);
-    }
-}
-
-void printStatement() :
-{}
-{
-    <PRINT> <ID>  // A print statement is "print" <ID>
-    {
-        Token id = getToken(1);    // Get the identifier
-        System.out.println("Print statement for: " + id.image);
-    }
-}
-
-
-
+void S(): {} { E() <EOF>           }
+void E(): {} { T() (<ADD> T())*      }
+void T(): {} { F() (<MUL> F())*      } // ADD higher priority
+void F(): {} { <NUMBER> | "(" E() ")" }

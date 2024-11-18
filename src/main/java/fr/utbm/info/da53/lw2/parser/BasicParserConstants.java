@@ -17,13 +17,15 @@ public interface BasicParserConstants {
   /** RegularExpression Id. */
   int EQ = 7;
   /** RegularExpression Id. */
-  int MATH = 8;
+  int ADD = 8;
   /** RegularExpression Id. */
-  int STRING = 9;
+  int MUL = 9;
   /** RegularExpression Id. */
-  int NUMBER = 10;
+  int STRING = 10;
   /** RegularExpression Id. */
-  int ID = 11;
+  int NUMBER = 11;
+  /** RegularExpression Id. */
+  int ID = 12;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -38,10 +40,13 @@ public interface BasicParserConstants {
     "\"\\n\"",
     "\"print\"",
     "\"=\"",
-    "<MATH>",
+    "<ADD>",
+    "<MUL>",
     "<STRING>",
     "<NUMBER>",
     "<ID>",
+    "\"(\"",
+    "\")\"",
   };
 
 }

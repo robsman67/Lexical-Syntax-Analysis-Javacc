@@ -13,19 +13,85 @@ public interface BasicParserConstants {
   /** RegularExpression Id. */
   int CR = 5;
   /** RegularExpression Id. */
-  int PRINT = 6;
+  int NUMBER = 6;
   /** RegularExpression Id. */
-  int EQ = 7;
+  int OPEN_PARENT = 7;
   /** RegularExpression Id. */
-  int ADD = 8;
+  int CLOSE_PARENT = 8;
   /** RegularExpression Id. */
-  int MUL = 9;
+  int PRINT = 9;
   /** RegularExpression Id. */
-  int STRING = 10;
+  int GOTO = 10;
   /** RegularExpression Id. */
-  int NUMBER = 11;
+  int INPUT = 11;
   /** RegularExpression Id. */
-  int ID = 12;
+  int LET = 12;
+  /** RegularExpression Id. */
+  int RETURN = 13;
+  /** RegularExpression Id. */
+  int GOSUB = 14;
+  /** RegularExpression Id. */
+  int END = 15;
+  /** RegularExpression Id. */
+  int IF = 16;
+  /** RegularExpression Id. */
+  int THEN = 17;
+  /** RegularExpression Id. */
+  int ELSE = 18;
+  /** RegularExpression Id. */
+  int WHILE = 19;
+  /** RegularExpression Id. */
+  int FOR = 20;
+  /** RegularExpression Id. */
+  int TO = 21;
+  /** RegularExpression Id. */
+  int STEP = 22;
+  /** RegularExpression Id. */
+  int NEXT = 23;
+  /** RegularExpression Id. */
+  int DO = 24;
+  /** RegularExpression Id. */
+  int WEND = 25;
+  /** RegularExpression Id. */
+  int DIFF = 26;
+  /** RegularExpression Id. */
+  int EQ = 27;
+  /** RegularExpression Id. */
+  int LE = 28;
+  /** RegularExpression Id. */
+  int GE = 29;
+  /** RegularExpression Id. */
+  int LT = 30;
+  /** RegularExpression Id. */
+  int GT = 31;
+  /** RegularExpression Id. */
+  int PLUS = 32;
+  /** RegularExpression Id. */
+  int MINUS = 33;
+  /** RegularExpression Id. */
+  int MULTIPLY = 34;
+  /** RegularExpression Id. */
+  int DIVIDE = 35;
+  /** RegularExpression Id. */
+  int AND = 36;
+  /** RegularExpression Id. */
+  int OR = 37;
+  /** RegularExpression Id. */
+  int XOR = 38;
+  /** RegularExpression Id. */
+  int NOT = 39;
+  /** RegularExpression Id. */
+  int FALSE = 40;
+  /** RegularExpression Id. */
+  int TRUE = 41;
+  /** RegularExpression Id. */
+  int COMA = 42;
+  /** RegularExpression Id. */
+  int STRING = 43;
+  /** RegularExpression Id. */
+  int UNDEF = 44;
+  /** RegularExpression Id. */
+  int IDENTIFIER = 45;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -38,15 +104,46 @@ public interface BasicParserConstants {
     "\"\\r\"",
     "<token of kind 4>",
     "\"\\n\"",
-    "\"print\"",
-    "\"=\"",
-    "<ADD>",
-    "<MUL>",
-    "<STRING>",
     "<NUMBER>",
-    "<ID>",
     "\"(\"",
     "\")\"",
+    "\"print\"",
+    "\"goto\"",
+    "\"input\"",
+    "\"let\"",
+    "\"return\"",
+    "\"gosub\"",
+    "\"end\"",
+    "\"if\"",
+    "\"then\"",
+    "\"else\"",
+    "\"while\"",
+    "\"for\"",
+    "\"to\"",
+    "\"step\"",
+    "\"next\"",
+    "\"do\"",
+    "\"wend\"",
+    "\"<>\"",
+    "\"=\"",
+    "\"<=\"",
+    "\">=\"",
+    "\"<\"",
+    "\">\"",
+    "\"+\"",
+    "\"-\"",
+    "\"*\"",
+    "\"/\"",
+    "\"and\"",
+    "\"or\"",
+    "\"xor\"",
+    "\"not\"",
+    "\"false\"",
+    "\"true\"",
+    "\",\"",
+    "<STRING>",
+    "\"undef\"",
+    "<IDENTIFIER>",
   };
 
 }

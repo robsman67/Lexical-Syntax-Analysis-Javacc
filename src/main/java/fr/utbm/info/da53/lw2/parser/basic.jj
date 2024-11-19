@@ -13,7 +13,15 @@ import java.io.StringReader;
 
 
 public class BasicParser {
-    String testChecker;
+    
+    private String testChecker;
+
+    private int basicLineNumber = 1;
+	private final SymbolTable symbolTable = new SymbolTable();
+
+	public SymbolTable getSymbolTable() {
+		return this.symbolTable;
+	}
 
     public BasicParser() {
     }
@@ -24,32 +32,238 @@ public class BasicParser {
         System.out.println("Syntax is correct!");
     }
 
+    // Create something that goes with a symbol table.
+    // Each new token goes with the declare methode
+    // Create a getSymboleTable, that return the symbole table for the main.
+    // 
+
 
 }
 
 PARSER_END(BasicParser)
 
-//The skip Token with the comment token
+// *** The skip Token with the comment token
 
 SKIP:  { " " | "\t" | "\r" | <"REM" ((" "|"\t")(~["\n","\r"])*)? ("\n" | "\r" | "\r\n" | "\n\r")> }
 
 
-// Keyword Token
+// *** Token Definitions
 
-TOKEN :
+
+TOKEN: { <CR: "\n"> }
+
+// Number token
+TOKEN: { <NUMBER : (["0"-"9"])+ ("." (["0"-"9"])+)?> 
+        | <OPEN_PARENT: "(">
+        | <CLOSE_PARENT: ")">
+
+        }
+
+
+// Keyword token
+
+TOKEN: { <PRINT: "print"> 
+        | <GOTO: "goto">
+        | <INPUT: "input">
+        | <LET: "let">
+        | <RETURN: "return">
+        | <GOSUB: "gosub">
+        | <END: "end">
+        | <IF: "if">
+        | <THEN: "then">
+        | <ELSE: "else">
+        | <WHILE: "while">
+        | <FOR: "for">
+        | <TO: "to">
+        | <STEP: "step">
+        | <NEXT: "next">
+        | <DO: "do">
+        | <WEND: "wend">
+        }
+
+// Relop token
+
+TOKEN: { <DIFF: "<>">
+        | <EQ: "=">
+        | <LE: "<="> 
+        | <GE: ">=">
+        | <LT: "<">
+        | <GT: ">">
+        | <PLUS: "+">
+        | <MINUS: "-">
+        | <MULTIPLY: "*">
+        | <DIVIDE: "/">
+        | <AND: "and">
+        | <OR: "or">
+        | <XOR: "xor">
+        | <NOT: "not">
+        | <FALSE: "false">
+        | <TRUE: "true">
+         }
+
+
+// Other Token 
+TOKEN: { <COMA: ","> 
+        | <STRING: "\"" (~["\""])* "\"" >
+        | <UNDEF: "undef">
+        }
+
+TOKEN: { <IDENTIFIER: ["a"-"z", "A"-"Z"](["a"-"z", "A"-"Z", "0"-"9"])*> } // Put it a the end in order to reconize it at lastly.
+
+// Grammar Rules from the course
+void S(): {} { statements() }
+
+void statements(): {}
 {
-	< CR: "\n" >
-    | < PRINT : "print">
-    | < EQ : "=" >
-    | < ADD : "+"|"-" > // lower priority
-    | < MUL : "/"|"*" > // higher priority
-    | < STRING: "\"" (~["\""])* "\"" >
-    | < NUMBER : (["0"-"9"])+ ("." (["0"-"9"])+)? > 
-    | < ID : ["a"-"z","A"-"Z"] ([ "a"-"z", "A"-"Z", "0"-"9" ])* > // doesn't allow to start with a number
-
+    lineOfCode() restOfStatements()
 }
 
-void S(): {} { E() <EOF>           }
-void E(): {} { T() (<ADD> T())*      }
-void T(): {} { F() (<MUL> F())*      } // ADD higher priority
-void F(): {} { <NUMBER> | "(" E() ")" }
+void restOfStatements(): {}
+{
+    <CR> lineOfCode() restOfStatements()
+    |
+    {}
+}
+
+void lineOfCode(): {}
+{
+    <NUMBER> statement()
+    |
+    statement()
+}
+
+void statement(): {}
+{
+    <PRINT> expression()
+    |
+    <GOTO> expression()
+    |
+    <INPUT> var_list()
+    |
+    <LET> <IDENTIFIER> arrayIndex() <EQ> expression()
+    |
+    <GOSUB> expression()
+    |
+    <RETURN>
+    |
+    <END>
+    |
+    <IF> expression() relop() expression() <THEN> statement() elseStatement()
+    |
+    <WHILE> expression() relop() expression() <DO> statement() <WEND>
+    |
+    <FOR> <IDENTIFIER> <EQ> expression() <TO> expression() forStep() statement() <NEXT> <IDENTIFIER>
+}
+
+void elseStatement(): {}
+{
+    <ELSE> statement()
+    |
+    {} // Empty
+}
+
+void forStep(): {}
+{
+    <STEP> expression()
+    |
+    {}
+}
+
+void relop(): {}
+{
+    <DIFF>
+    |
+    <LE>
+    |
+    <GE>
+    |
+    <EQ>
+    |
+    <LT>
+    |
+    <GT>
+}
+
+void var_list(): {}
+{
+    <IDENTIFIER> arrayIndex() var_list_opt()
+}
+
+void var_list_opt(): {}
+{
+    <COMA> <IDENTIFIER> arrayIndex() var_list_opt()
+    |
+    {}
+}
+
+void arrayIndex(): {}
+{
+    <OPEN_PARENT> expression() <CLOSE_PARENT>
+    |
+    {}
+}
+
+void expression(): {}
+{
+    term() expression_end()
+}
+
+void expression_end(): {}
+{
+    <PLUS> term() expression_end()
+    |
+    <MINUS> term() expression_end()
+    |
+    {}
+}
+
+void term(): {}
+{
+    iterm() term_end()
+}
+
+void term_end(): {}
+{
+    <MULTIPLY> iterm() term_end()
+    |
+    <DIVIDE> iterm() term_end()
+    |
+    {}
+}
+
+void iterm(): {}
+{
+    factor() iterm_end()
+    |
+    {}
+}
+
+void iterm_end(): {}
+{
+    <AND> factor() iterm_end()
+    |
+    <OR> factor() iterm_end()
+    |
+    <XOR> factor() iterm_end()
+    |
+    {}
+}
+
+void factor(): {}
+{
+    <OPEN_PARENT> expression() <CLOSE_PARENT>
+    |
+    <NOT> expression()
+    |
+    <NUMBER>
+    |
+    <STRING>
+    |
+    <TRUE>
+    |
+    <FALSE>
+    |
+    <UNDEF>
+    |
+    <IDENTIFIER> arrayIndex()
+}

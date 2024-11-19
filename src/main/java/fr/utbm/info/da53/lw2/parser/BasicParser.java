@@ -6,7 +6,15 @@ import java.io.StringReader;
 
 
 public class BasicParser implements BasicParserConstants {
-    String testChecker;
+
+    private String testChecker;
+
+    private int basicLineNumber = 1;
+        private final SymbolTable symbolTable = new SymbolTable();
+
+        public SymbolTable getSymbolTable() {
+                return this.symbolTable;
+        }
 
     public BasicParser() {
     }
@@ -17,61 +25,367 @@ public class BasicParser implements BasicParserConstants {
         System.out.println("Syntax is correct!");
     }
 
+// Put it a the end in order to reconize it at lastly.
+
+// Grammar Rules from the course
   static final public void S() throws ParseException {
-    E();
-    jj_consume_token(0);
+    statements();
 }
 
-  static final public void E() throws ParseException {
-    T();
-    label_1:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case ADD:{
-        ;
-        break;
-        }
-      default:
-        jj_la1[0] = jj_gen;
-        break label_1;
+  static final public void statements() throws ParseException {
+    lineOfCode();
+    restOfStatements();
+}
+
+  static final public void restOfStatements() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case CR:{
+      jj_consume_token(CR);
+      lineOfCode();
+      restOfStatements();
+      break;
       }
-      jj_consume_token(ADD);
-      T();
+    default:
+      jj_la1[0] = jj_gen;
+
     }
 }
 
-  static final public void T() throws ParseException {
-    F();
-    label_2:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case MUL:{
-        ;
-        break;
-        }
-      default:
-        jj_la1[1] = jj_gen;
-        break label_2;
-      }
-      jj_consume_token(MUL);
-      F();
-    }
-}
-
-  static final public void F() throws ParseException {
+  static final public void lineOfCode() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case NUMBER:{
       jj_consume_token(NUMBER);
+      statement();
       break;
       }
-    case 13:{
-      jj_consume_token(13);
-      E();
-      jj_consume_token(14);
+    case PRINT:
+    case GOTO:
+    case INPUT:
+    case LET:
+    case RETURN:
+    case GOSUB:
+    case END:
+    case IF:
+    case WHILE:
+    case FOR:{
+      statement();
+      break;
+      }
+    default:
+      jj_la1[1] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+}
+
+  static final public void statement() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case PRINT:{
+      jj_consume_token(PRINT);
+      expression();
+      break;
+      }
+    case GOTO:{
+      jj_consume_token(GOTO);
+      expression();
+      break;
+      }
+    case INPUT:{
+      jj_consume_token(INPUT);
+      var_list();
+      break;
+      }
+    case LET:{
+      jj_consume_token(LET);
+      jj_consume_token(IDENTIFIER);
+      arrayIndex();
+      jj_consume_token(EQ);
+      expression();
+      break;
+      }
+    case GOSUB:{
+      jj_consume_token(GOSUB);
+      expression();
+      break;
+      }
+    case RETURN:{
+      jj_consume_token(RETURN);
+      break;
+      }
+    case END:{
+      jj_consume_token(END);
+      break;
+      }
+    case IF:{
+      jj_consume_token(IF);
+      expression();
+      relop();
+      expression();
+      jj_consume_token(THEN);
+      statement();
+      elseStatement();
+      break;
+      }
+    case WHILE:{
+      jj_consume_token(WHILE);
+      expression();
+      relop();
+      expression();
+      jj_consume_token(DO);
+      statement();
+      jj_consume_token(WEND);
+      break;
+      }
+    case FOR:{
+      jj_consume_token(FOR);
+      jj_consume_token(IDENTIFIER);
+      jj_consume_token(EQ);
+      expression();
+      jj_consume_token(TO);
+      expression();
+      forStep();
+      statement();
+      jj_consume_token(NEXT);
+      jj_consume_token(IDENTIFIER);
       break;
       }
     default:
       jj_la1[2] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+}
+
+  static final public void elseStatement() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case ELSE:{
+      jj_consume_token(ELSE);
+      statement();
+      break;
+      }
+    default:
+      jj_la1[3] = jj_gen;
+
+    }
+}
+
+  static final public void forStep() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case STEP:{
+      jj_consume_token(STEP);
+      expression();
+      break;
+      }
+    default:
+      jj_la1[4] = jj_gen;
+
+    }
+}
+
+  static final public void relop() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case DIFF:{
+      jj_consume_token(DIFF);
+      break;
+      }
+    case LE:{
+      jj_consume_token(LE);
+      break;
+      }
+    case GE:{
+      jj_consume_token(GE);
+      break;
+      }
+    case EQ:{
+      jj_consume_token(EQ);
+      break;
+      }
+    case LT:{
+      jj_consume_token(LT);
+      break;
+      }
+    case GT:{
+      jj_consume_token(GT);
+      break;
+      }
+    default:
+      jj_la1[5] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+}
+
+  static final public void var_list() throws ParseException {
+    jj_consume_token(IDENTIFIER);
+    arrayIndex();
+    var_list_opt();
+}
+
+  static final public void var_list_opt() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case COMA:{
+      jj_consume_token(COMA);
+      jj_consume_token(IDENTIFIER);
+      arrayIndex();
+      var_list_opt();
+      break;
+      }
+    default:
+      jj_la1[6] = jj_gen;
+
+    }
+}
+
+  static final public void arrayIndex() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case OPEN_PARENT:{
+      jj_consume_token(OPEN_PARENT);
+      expression();
+      jj_consume_token(CLOSE_PARENT);
+      break;
+      }
+    default:
+      jj_la1[7] = jj_gen;
+
+    }
+}
+
+  static final public void expression() throws ParseException {
+    term();
+    expression_end();
+}
+
+  static final public void expression_end() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case PLUS:{
+      jj_consume_token(PLUS);
+      term();
+      expression_end();
+      break;
+      }
+    case MINUS:{
+      jj_consume_token(MINUS);
+      term();
+      expression_end();
+      break;
+      }
+    default:
+      jj_la1[8] = jj_gen;
+
+    }
+}
+
+  static final public void term() throws ParseException {
+    iterm();
+    term_end();
+}
+
+  static final public void term_end() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case MULTIPLY:{
+      jj_consume_token(MULTIPLY);
+      iterm();
+      term_end();
+      break;
+      }
+    case DIVIDE:{
+      jj_consume_token(DIVIDE);
+      iterm();
+      term_end();
+      break;
+      }
+    default:
+      jj_la1[9] = jj_gen;
+
+    }
+}
+
+  static final public void iterm() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case NUMBER:
+    case OPEN_PARENT:
+    case NOT:
+    case FALSE:
+    case TRUE:
+    case STRING:
+    case UNDEF:
+    case IDENTIFIER:{
+      factor();
+      iterm_end();
+      break;
+      }
+    default:
+      jj_la1[10] = jj_gen;
+
+    }
+}
+
+  static final public void iterm_end() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case AND:{
+      jj_consume_token(AND);
+      factor();
+      iterm_end();
+      break;
+      }
+    case OR:{
+      jj_consume_token(OR);
+      factor();
+      iterm_end();
+      break;
+      }
+    case XOR:{
+      jj_consume_token(XOR);
+      factor();
+      iterm_end();
+      break;
+      }
+    default:
+      jj_la1[11] = jj_gen;
+
+    }
+}
+
+  static final public void factor() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case OPEN_PARENT:{
+      jj_consume_token(OPEN_PARENT);
+      expression();
+      jj_consume_token(CLOSE_PARENT);
+      break;
+      }
+    case NOT:{
+      jj_consume_token(NOT);
+      expression();
+      break;
+      }
+    case NUMBER:{
+      jj_consume_token(NUMBER);
+      break;
+      }
+    case STRING:{
+      jj_consume_token(STRING);
+      break;
+      }
+    case TRUE:{
+      jj_consume_token(TRUE);
+      break;
+      }
+    case FALSE:{
+      jj_consume_token(FALSE);
+      break;
+      }
+    case UNDEF:{
+      jj_consume_token(UNDEF);
+      break;
+      }
+    case IDENTIFIER:{
+      jj_consume_token(IDENTIFIER);
+      arrayIndex();
+      break;
+      }
+    default:
+      jj_la1[12] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -87,13 +401,18 @@ public class BasicParser implements BasicParserConstants {
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[3];
+  static final private int[] jj_la1 = new int[13];
   static private int[] jj_la1_0;
+  static private int[] jj_la1_1;
   static {
 	   jj_la1_init_0();
+	   jj_la1_init_1();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x100,0x200,0x2800,};
+	   jj_la1_0 = new int[] {0x20,0x19fe40,0x19fe00,0x40000,0x400000,0xfc000000,0x0,0x80,0x0,0x0,0xc0,0x0,0xc0,};
+	}
+	private static void jj_la1_init_1() {
+	   jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x400,0x0,0x3,0xc,0x3b80,0x70,0x3b80,};
 	}
 
   /** Constructor with InputStream. */
@@ -114,7 +433,7 @@ public class BasicParser implements BasicParserConstants {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 3; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -128,7 +447,7 @@ public class BasicParser implements BasicParserConstants {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 3; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -145,7 +464,7 @@ public class BasicParser implements BasicParserConstants {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 3; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -163,7 +482,7 @@ public class BasicParser implements BasicParserConstants {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 3; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -179,7 +498,7 @@ public class BasicParser implements BasicParserConstants {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 3; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -188,7 +507,7 @@ public class BasicParser implements BasicParserConstants {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 3; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -239,21 +558,24 @@ public class BasicParser implements BasicParserConstants {
   /** Generate ParseException. */
   static public ParseException generateParseException() {
 	 jj_expentries.clear();
-	 boolean[] la1tokens = new boolean[15];
+	 boolean[] la1tokens = new boolean[46];
 	 if (jj_kind >= 0) {
 	   la1tokens[jj_kind] = true;
 	   jj_kind = -1;
 	 }
-	 for (int i = 0; i < 3; i++) {
+	 for (int i = 0; i < 13; i++) {
 	   if (jj_la1[i] == jj_gen) {
 		 for (int j = 0; j < 32; j++) {
 		   if ((jj_la1_0[i] & (1<<j)) != 0) {
 			 la1tokens[j] = true;
 		   }
+		   if ((jj_la1_1[i] & (1<<j)) != 0) {
+			 la1tokens[32+j] = true;
+		   }
 		 }
 	   }
 	 }
-	 for (int i = 0; i < 15; i++) {
+	 for (int i = 0; i < 46; i++) {
 	   if (la1tokens[i]) {
 		 jj_expentry = new int[1];
 		 jj_expentry[0] = i;
@@ -281,5 +603,11 @@ public class BasicParser implements BasicParserConstants {
   /** Disable tracing. */
   static final public void disable_tracing() {
   }
+
+    // Create something that goes with a symbol table.
+    // Each new token goes with the declare methode
+    // Create a getSymboleTable, that return the symbole table for the main.
+    // 
+
 
 }

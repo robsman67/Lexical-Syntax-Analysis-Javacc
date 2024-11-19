@@ -34,7 +34,6 @@ public class BasicParser {
 
     // Create something that goes with a symbol table.
     // Each new token goes with the declare methode
-    // Create a getSymboleTable, that return the symbole table for the main.
     // 
 
 

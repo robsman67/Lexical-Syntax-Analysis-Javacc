@@ -1,14 +1,16 @@
-/*
+
 options {
   IGNORE_CASE = true;
   STATIC = false;
 } 
-*/
+
 
 PARSER_BEGIN(BasicParser)
 
 package fr.utbm.info.da53.lw2.parser;
+
 import java.io.StringReader;
+import fr.utbm.info.da53.lw2.symbol.*;
 
 
 
@@ -26,11 +28,17 @@ public class BasicParser {
     public BasicParser() {
     }
 
-    public static void parse(String input) throws ParseException {
+    public void parse(String input) throws ParseException {
         BasicParser parser = new BasicParser(new StringReader(input));
         parser.S(); // Start parsing from the grammar's start symbol
         System.out.println("Syntax is correct!");
     }
+
+    public int getBasicLineNumber(){
+        return this.basicLineNumber;
+    }
+
+
 
     // Create something that goes with a symbol table.
     // Each new token goes with the declare methode
@@ -79,7 +87,6 @@ TOKEN: { <PRINT: "print">
         | <DO: "do">
         | <WEND: "wend">
         }
-
 // Relop token
 
 TOKEN: { <DIFF: "<>">
@@ -131,7 +138,7 @@ void lineOfCode(): {}
     statement()
 }
 
-void statement(): {}
+void statement(): {Token x;}
 {
     <PRINT> expression()
     |
@@ -139,7 +146,14 @@ void statement(): {}
     |
     <INPUT> var_list()
     |
-    <LET> <IDENTIFIER> arrayIndex() <EQ> expression()
+    <LET> x = <IDENTIFIER> arrayIndex() <EQ> expression() {
+        if (this.symbolTable.contains(x.image)) {
+            System.out.println("Variable already exists: " + x.image);
+        } else {
+            this.symbolTable.declare(x.image, this.getBasicLineNumber());
+            System.out.println("Declared variable: " + x.image);
+        }
+    }
     |
     <GOSUB> expression()
     |

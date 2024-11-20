@@ -39,11 +39,11 @@ public class BasicInterpreter {
 
  public static void main(String[] args) throws ParseException, IOException {
 
-	String testChecker = "if 5 > 3 then let x = 5 + 3";
-	//BasicParser bp = new BasicParser();	
+	String testChecker = "if 5 = 7 then let x = 5 + 3 else print 7";
+	BasicParser bp = new BasicParser();	
 
 	try {
-		BasicParser.parse(testChecker);
+		bp.parse(testChecker);
 	} catch (ParseException e) {
 		System.err.println("Syntax error: " + e.getMessage());
 	}

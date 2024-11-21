@@ -1,4 +1,3 @@
-
 options {
   IGNORE_CASE = true;
   STATIC = false;
@@ -17,16 +16,17 @@ import fr.utbm.info.da53.lw2.symbol.*;
 public class BasicParser {
     
     private String testChecker;
-
-    private int basicLineNumber = 1;
+    
+    private int lineTracker = 1;
 	private final SymbolTable symbolTable = new SymbolTable();
+
+    public BasicParser() {
+    }
 
 	public SymbolTable getSymbolTable() {
 		return this.symbolTable;
 	}
 
-    public BasicParser() {
-    }
 
     public void parse(String input) throws ParseException {
         BasicParser parser = new BasicParser(new StringReader(input));
@@ -34,8 +34,12 @@ public class BasicParser {
         System.out.println("Syntax is correct!");
     }
 
-    public int getBasicLineNumber(){
-        return this.basicLineNumber;
+    public int getLineTrackerumber(){
+        return this.lineTracker;
+    }
+
+    public void incrementLineTracker(){
+        this.lineTracker++;
     }
 
 
@@ -140,7 +144,10 @@ void lineOfCode(): {}
 
 void statement(): {Token x;}
 {
-    <PRINT> expression()
+    <PRINT> expression() {
+        this.symbolTable.declare("print", this.getLineTrackerumber());
+        System.out.println("Print statement " + getLineTrackerumber());
+    }
     |
     <GOTO> expression()
     |
@@ -150,7 +157,7 @@ void statement(): {Token x;}
         if (this.symbolTable.contains(x.image)) {
             System.out.println("Variable already exists: " + x.image);
         } else {
-            this.symbolTable.declare(x.image, this.getBasicLineNumber());
+            this.symbolTable.declare(x.image, this.getLineTrackerumber());
             System.out.println("Declared variable: " + x.image);
         }
     }
@@ -241,7 +248,7 @@ void term_end(): {}
     |
     <DIVIDE> iterm() term_end()
     |
-    {}
+    {} 
 }
 
 void iterm(): {}

@@ -39,7 +39,7 @@ public class BasicInterpreter {
 
  public static void main(String[] args) throws ParseException, IOException {
 
-	String testChecker = "if 5 = 7 then let x = 5 + 3 else print 7";
+	String testChecker = "if 5 = 7 then let x = 5 + 3 else print 7 \n print x \n end";
 	BasicParser bp = new BasicParser();	
 
 	try {

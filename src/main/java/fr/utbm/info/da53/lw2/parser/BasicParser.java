@@ -11,15 +11,16 @@ public class BasicParser implements BasicParserConstants {
 
     private String testChecker;
 
-    private int basicLineNumber = 1;
+    private int lineTracker = 1;
         private final SymbolTable symbolTable = new SymbolTable();
+
+    public BasicParser() {
+    }
 
         public SymbolTable getSymbolTable() {
                 return this.symbolTable;
         }
 
-    public BasicParser() {
-    }
 
     public void parse(String input) throws ParseException {
         BasicParser parser = new BasicParser(new StringReader(input));
@@ -27,8 +28,12 @@ public class BasicParser implements BasicParserConstants {
         System.out.println("Syntax is correct!");
     }
 
-    public int getBasicLineNumber(){
-        return this.basicLineNumber;
+    public int getLineTrackerumber(){
+        return this.lineTracker;
+    }
+
+    public void incrementLineTracker(){
+        this.lineTracker++;
     }
 
 // Put it a the end in order to reconize it at lastly.
@@ -89,6 +94,8 @@ public class BasicParser implements BasicParserConstants {
     case PRINT:{
       jj_consume_token(PRINT);
       expression();
+this.symbolTable.declare("print", this.getLineTrackerumber());
+        System.out.println("Print statement " + getLineTrackerumber());
       break;
       }
     case GOTO:{
@@ -110,7 +117,7 @@ public class BasicParser implements BasicParserConstants {
 if (this.symbolTable.contains(x.image)) {
             System.out.println("Variable already exists: " + x.image);
         } else {
-            this.symbolTable.declare(x.image, this.getBasicLineNumber());
+            this.symbolTable.declare(x.image, this.getLineTrackerumber());
             System.out.println("Declared variable: " + x.image);
         }
       break;
@@ -355,6 +362,7 @@ if (this.symbolTable.contains(x.image)) {
     default:
       jj_la1[11] = jj_gen;
 
+incrementLineTracker();
     }
 }
 

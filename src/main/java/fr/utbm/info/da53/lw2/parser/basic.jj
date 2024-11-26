@@ -121,6 +121,7 @@ TOKEN: { <COMA: ",">
 TOKEN: { <IDENTIFIER: ["a"-"z", "A"-"Z"](["a"-"z", "A"-"Z", "0"-"9"])*> } // Put it a the end in order to reconize it at lastly.
 
 // Grammar Rules from the course
+
 void S(): {} { statements() }
 
 void statements(): {}
@@ -135,11 +136,15 @@ void restOfStatements(): {}
     {}
 }
 
-void lineOfCode(): {}
+void lineOfCode(): {} // We can increment line number here.
 {
-    <NUMBER> statement()
+    <NUMBER> statement() {
+        this.incrementLineTracker();
+    }
     |
-    statement()
+    statement(){
+        this.incrementLineTracker();
+    }
 }
 
 void statement(): {Token x;}

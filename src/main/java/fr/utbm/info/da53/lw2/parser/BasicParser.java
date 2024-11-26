@@ -39,7 +39,8 @@ public class BasicParser implements BasicParserConstants {
 // Put it a the end in order to reconize it at lastly.
 
 // Grammar Rules from the course
-  final public void S() throws ParseException {
+  final public 
+void S() throws ParseException {
     statements();
 }
 
@@ -67,6 +68,7 @@ public class BasicParser implements BasicParserConstants {
     case NUMBER:{
       jj_consume_token(NUMBER);
       statement();
+this.incrementLineTracker();
       break;
       }
     case PRINT:
@@ -80,6 +82,7 @@ public class BasicParser implements BasicParserConstants {
     case WHILE:
     case FOR:{
       statement();
+this.incrementLineTracker();
       break;
       }
     default:
@@ -362,7 +365,6 @@ if (this.symbolTable.contains(x.image)) {
     default:
       jj_la1[11] = jj_gen;
 
-incrementLineTracker();
     }
 }
 

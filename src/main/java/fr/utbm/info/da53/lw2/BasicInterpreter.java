@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import fr.utbm.info.da53.lw2.parser.BasicParser;
 import fr.utbm.info.da53.lw2.parser.ParseException;
+import fr.utbm.info.da53.lw2.symbol.SymbolTable;
 
 
 /**
@@ -39,11 +40,14 @@ public class BasicInterpreter {
 
  public static void main(String[] args) throws ParseException, IOException {
 
-	String testChecker = "if 5 = 7 then let x = 5 + 3 else print 7 \n print x \n let x = 5 \n let y = 3 \n print x end";
+	//String testChecker = "if 5 < 7 then let x = 5 + 3 else print 7 \n print x \n let x = 5 \n let y = 3 \n print x end";
+	String testChecker = "let x = 5 + 7";
 	BasicParser bp = new BasicParser();	
 
 	try {
 		bp.parse(testChecker);
+		SymbolTable s = bp.getSymbolTable();
+		System.out.println(s);
 	} catch (ParseException e) {
 		System.err.println("Syntax error: " + e.getMessage());
 	}

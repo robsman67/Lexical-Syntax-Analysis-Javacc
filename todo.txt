@@ -8,4 +8,4 @@ Arbre avec des noeuds, recuperer les elements et executer la semantique
 
 Abstract Syntax Tree (AST) : for every rule like while, for, equal,...
 
-Do symbolTable correctly
+Ouvrir le fichier test pour l'analyser dans le parser et commencer les test

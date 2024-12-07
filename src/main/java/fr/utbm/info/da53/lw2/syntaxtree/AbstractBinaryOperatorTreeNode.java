@@ -122,7 +122,7 @@ public abstract class AbstractBinaryOperatorTreeNode extends AbstractValueTreeNo
 
 	/** Replies the operator as a string.
 	 * 
-	 * @return the operator.
+	 * @return the operato	r.
 	 */
 	public abstract String getOperatorString();
 	

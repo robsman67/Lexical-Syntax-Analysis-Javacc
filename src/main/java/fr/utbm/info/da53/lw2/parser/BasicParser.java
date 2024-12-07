@@ -3,8 +3,10 @@
 package fr.utbm.info.da53.lw2.parser;
 
 import java.io.StringReader;
-import fr.utbm.info.da53.lw2.symbol.*;
+import java.util.SortedMap;
 
+import fr.utbm.info.da53.lw2.symbol.*;
+import fr.utbm.info.da53.lw2.context.Statement;
 
 
 public class BasicParser implements BasicParserConstants {
@@ -34,6 +36,12 @@ public class BasicParser implements BasicParserConstants {
 
     public void incrementLineTracker(){
         this.lineTracker++;
+    }
+
+    public SortedMap<Integer,Statement> executeCompiler (){
+        System.out.println("Execute Compiler");
+        SortedMap<Integer,Statement> sortedMap = null;
+        return sortedMap;
     }
 
 // Put it a the end in order to reconize it at lastly.

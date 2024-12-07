@@ -18,11 +18,17 @@
  */
 package fr.utbm.info.da53.lw2;
 
-import java.io.IOException;
+import java.io.File;
+import java.util.SortedMap;
 
+import fr.utbm.info.da53.lw2.context.DebugInterpreter;
+import fr.utbm.info.da53.lw2.context.Interpreter;
+import fr.utbm.info.da53.lw2.context.LineBasedInterpreter;
+import fr.utbm.info.da53.lw2.context.Statement;
+import fr.utbm.info.da53.lw2.error.ErrorRepository;
+import fr.utbm.info.da53.lw2.error.InterpreterException;
 import fr.utbm.info.da53.lw2.parser.BasicParser;
-import fr.utbm.info.da53.lw2.parser.ParseException;
-import fr.utbm.info.da53.lw2.symbol.SymbolTable;
+import fr.utbm.info.da53.lw2.ui.InterpreterDialog;
 
 
 /**
@@ -38,26 +44,6 @@ public class BasicInterpreter {
 	 * @param args
 	 */
 
- public static void main(String[] args) throws ParseException, IOException {
-
-	//String testChecker = "if 5 < 7 then let x = 5 + 3 else print 7 \n print x \n let x = 5 \n let y = 3 \n print x end";
-	String testChecker = "let x = 5 + 7";
-	BasicParser bp = new BasicParser();	
-
-	try {
-		bp.parse(testChecker);
-		SymbolTable s = bp.getSymbolTable();
-		System.out.println(s);
-	} catch (ParseException e) {
-		System.err.println("Syntax error: " + e.getMessage());
-	}
-
-
-}
-
-	/*
-	
-	Code to excute !!
 
 	public static void main(String args[]) {
 		BasicParser parser;
@@ -83,30 +69,40 @@ public class BasicInterpreter {
 			return ;
 		}
 		SortedMap<Integer,Statement> code = null;
-		try {
+
+		/*
+				try {
 			code = parser.executeCompiler();
 		}
 		catch(LoggableException e) {
 			ErrorRepository.add(e);
 		}
-		
+		 */
+
+		code = parser.executeCompiler();
+
 		System.out.println("Running the code into the interpreter");
 		DebugInterpreter debugContext = null;
 
 		if (code!=null && !code.isEmpty()) {
 			Interpreter interpreter = new LineBasedInterpreter(code, parser.getSymbolTable());
 			try {
+				System.out.println("here");
+
 				debugContext = interpreter.debug();
+
 			}
 			catch (InterpreterException e) {
 				ErrorRepository.add(e);
+				System.out.println("here");
+
 			}
 		}
-		
+		System.out.println("here");
+
 		InterpreterDialog dialog = new InterpreterDialog(filename, debugContext, !ErrorRepository.hasError());
 		dialog.setVisible(true);
 	}
 
-	*/
 
 }

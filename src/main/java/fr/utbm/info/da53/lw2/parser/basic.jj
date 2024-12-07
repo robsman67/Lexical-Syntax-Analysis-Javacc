@@ -9,8 +9,10 @@ PARSER_BEGIN(BasicParser)
 package fr.utbm.info.da53.lw2.parser;
 
 import java.io.StringReader;
-import fr.utbm.info.da53.lw2.symbol.*;
+import java.util.SortedMap;
 
+import fr.utbm.info.da53.lw2.symbol.*;
+import fr.utbm.info.da53.lw2.context.Statement;
 
 
 public class BasicParser {
@@ -40,6 +42,12 @@ public class BasicParser {
 
     public void incrementLineTracker(){
         this.lineTracker++;
+    }
+
+    public SortedMap<Integer,Statement> executeCompiler (){
+        System.out.println("Execute Compiler");
+        SortedMap<Integer,Statement> sortedMap = null;
+        return sortedMap;
     }
 
 

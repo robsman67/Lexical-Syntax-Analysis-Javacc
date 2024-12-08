@@ -49,37 +49,23 @@ public class BasicInterpreter {
 		BasicParser parser;
 		String filename;
 
-		if(args.length == 0){
-			System.out.println("Input your TinyBasic code:");
-			parser = new BasicParser(System.in);
-			filename = "Standard Input"; //$NON-NLS-1$
+		File f = new File ("./src/test/java/test1.tb");
+
+		try {
+			parser = new BasicParser(new java.io.FileInputStream(f));
 		}
-		else if(args.length == 1){
-			File f = new File(args[0]);
-			try {
-				parser = new BasicParser(new java.io.FileInputStream(f));
-			}
-			catch(java.io.FileNotFoundException e){
-				e.printStackTrace();
-				return ;
-			}
-			filename = f.getName();
-		}
-		else {
+		catch(java.io.FileNotFoundException e){
+			e.printStackTrace();
 			return ;
 		}
+		filename = f.getName();
+		System.out.println(filename);
+
+
 		SortedMap<Integer,Statement> code = null;
 
-		/*
-				try {
-			code = parser.executeCompiler();
-		}
-		catch(LoggableException e) {
-			ErrorRepository.add(e);
-		}
-		 */
-
 		code = parser.executeCompiler();
+
 
 		System.out.println("Running the code into the interpreter");
 		DebugInterpreter debugContext = null;
@@ -104,5 +90,65 @@ public class BasicInterpreter {
 		dialog.setVisible(true);
 	}
 
+/*
+
+	public static void main(String args[]) {
+		BasicParser parser;
+		String filename;
+
+		if(args.length == 0){
+			System.out.println("Input your TinyBasic code:");
+			parser = new BasicParser(System.in);
+			filename = "Standard Input"; //$NON-NLS-1$
+		}
+		else if(args.length == 1){
+			File f = new File(args[0]);
+			try {
+				parser = new BasicParser(new java.io.FileInputStream(f));
+			}
+			catch(java.io.FileNotFoundException e){
+				e.printStackTrace();
+				return ;
+			}
+			filename = f.getName();
+		}
+		else {
+			return ;
+		}
+		SortedMap<Integer,Statement> code = null;
+
+				try {
+			code = parser.executeCompiler();
+		}
+		catch(LoggableException e) {
+			ErrorRepository.add(e);
+		}
+
+
+		System.out.println("Running the code into the interpreter");
+		DebugInterpreter debugContext = null;
+
+		if (code!=null && !code.isEmpty()) {
+			Interpreter interpreter = new LineBasedInterpreter(code, parser.getSymbolTable());
+			try {
+				System.out.println("here");
+
+				debugContext = interpreter.debug();
+
+			}
+			catch (InterpreterException e) {
+				ErrorRepository.add(e);
+				System.out.println("here");
+
+			}
+		}
+		System.out.println("here");
+
+		InterpreterDialog dialog = new InterpreterDialog(filename, debugContext, !ErrorRepository.hasError());
+		dialog.setVisible(true);
+	}
+
+
+ */
 
 }

@@ -72,19 +72,20 @@ public class BasicInterpreter {
 
 		if (code!=null && !code.isEmpty()) {
 			Interpreter interpreter = new LineBasedInterpreter(code, parser.getSymbolTable());
+			System.out.println("here");
 			try {
-				System.out.println("here");
+				System.out.println("here try");
 
 				debugContext = interpreter.debug();
 
 			}
 			catch (InterpreterException e) {
 				ErrorRepository.add(e);
-				System.out.println("here");
+				System.out.println("here catch");
 
 			}
 		}
-		System.out.println("here");
+
 
 		InterpreterDialog dialog = new InterpreterDialog(filename, debugContext, !ErrorRepository.hasError());
 		dialog.setVisible(true);
@@ -117,7 +118,7 @@ public class BasicInterpreter {
 		}
 		SortedMap<Integer,Statement> code = null;
 
-				try {
+		try {
 			code = parser.executeCompiler();
 		}
 		catch(LoggableException e) {

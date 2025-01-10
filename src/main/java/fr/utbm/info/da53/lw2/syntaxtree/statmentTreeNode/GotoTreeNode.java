@@ -1,12 +1,14 @@
-package fr.utbm.info.da53.lw2.syntaxtree;
+package fr.utbm.info.da53.lw2.syntaxtree.statmentTreeNode;
 
 import fr.utbm.info.da53.lw2.context.ExecutionContext;
 import fr.utbm.info.da53.lw2.error.InterpreterException;
+import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractStatementTreeNode;
+import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractValueTreeNode;
 
-public class EndTreeNode extends AbstractStatementTreeNode{
+public class GotoTreeNode extends AbstractStatementTreeNode {
 
-    public EndTreeNode(){
-
+    public GotoTreeNode(AbstractValueTreeNode line){
+        setChildren(line);
     }
 
 
@@ -24,6 +26,6 @@ public class EndTreeNode extends AbstractStatementTreeNode{
 
     @Override
     public String toString() {
-        return "END";
+        return "GOTO " + getChildAt(0).toString();
     }
 }

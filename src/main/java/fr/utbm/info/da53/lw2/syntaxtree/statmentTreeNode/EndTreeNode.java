@@ -1,13 +1,15 @@
-package fr.utbm.info.da53.lw2.syntaxtree;
+package fr.utbm.info.da53.lw2.syntaxtree.statmentTreeNode;
 
 import fr.utbm.info.da53.lw2.context.ExecutionContext;
 import fr.utbm.info.da53.lw2.error.InterpreterException;
+import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractStatementTreeNode;
 
-public class GosubTreeNode extends AbstractStatementTreeNode {
+public class EndTreeNode extends AbstractStatementTreeNode {
 
-    public GosubTreeNode (AbstractValueTreeNode line) {
-        setChildren(line);
+    public EndTreeNode(){
+
     }
+
 
     /**
      * Run the statement.
@@ -23,6 +25,6 @@ public class GosubTreeNode extends AbstractStatementTreeNode {
 
     @Override
     public String toString() {
-        return "GOSUB " + getChildAt(0).toString();
+        return "END";
     }
 }

@@ -1,14 +1,15 @@
-package fr.utbm.info.da53.lw2.syntaxtree;
+package fr.utbm.info.da53.lw2.syntaxtree.statmentTreeNode;
 
 import fr.utbm.info.da53.lw2.context.ExecutionContext;
 import fr.utbm.info.da53.lw2.error.InterpreterException;
+import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractStatementTreeNode;
+import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractValueTreeNode;
 
-public class ForTreeNode extends AbstractStatementTreeNode{
+public class InputTreeNode extends AbstractStatementTreeNode {
 
-    public ForTreeNode (AbstractStatementTreeNode init, AbstractValueTreeNode condition, AbstractStatementTreeNode increment, AbstractStatementTreeNode body){
-        setChildren(init, condition, increment, body);
+    public InputTreeNode(AbstractValueTreeNode variable) {
+        setChildren(variable);
     }
-
 
     /**
      * Run the statement.
@@ -22,8 +23,10 @@ public class ForTreeNode extends AbstractStatementTreeNode{
         return null;
     }
 
+
     @Override
     public String toString() {
-        return "for " + getChildAt(0) + " ; " + getChildAt(1) + " ; " + getChildAt(2) + " do " + getChildAt(3);
+        return "input " + getChildAt(0);
     }
+
 }

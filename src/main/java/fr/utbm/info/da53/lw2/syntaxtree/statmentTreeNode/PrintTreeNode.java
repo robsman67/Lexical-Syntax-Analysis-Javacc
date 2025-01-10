@@ -1,13 +1,16 @@
-package fr.utbm.info.da53.lw2.syntaxtree;
+package fr.utbm.info.da53.lw2.syntaxtree.statmentTreeNode;
 
 import fr.utbm.info.da53.lw2.context.ExecutionContext;
 import fr.utbm.info.da53.lw2.error.InterpreterException;
+import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractStatementTreeNode;
+import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractValueTreeNode;
 
-public class InputTreeNode extends AbstractStatementTreeNode {
+public class PrintTreeNode extends AbstractStatementTreeNode {
 
-    public InputTreeNode(AbstractValueTreeNode variable) {
-        setChildren(variable);
+    public PrintTreeNode(AbstractValueTreeNode value) {
+        setChildren(value);
     }
+
 
     /**
      * Run the statement.
@@ -21,10 +24,8 @@ public class InputTreeNode extends AbstractStatementTreeNode {
         return null;
     }
 
-
     @Override
     public String toString() {
-        return "input " + getChildAt(0);
+        return "print(" + getChildAt(0) + ")";
     }
-
 }

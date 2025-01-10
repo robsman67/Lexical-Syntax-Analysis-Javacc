@@ -1,11 +1,1 @@
-
-
-Fonction run qui interprete ligne par ligne quand ds l'interface graphique on met step
-puis le print
-
-Arbre avec des noeuds, recuperer les elements et executer la semantique
-
-
-Abstract Syntax Tree (AST) : for every rule like while, for, equal,...
-
-Ouvrir le fichier test pour l'analyser dans le parser et commencer les test
+Maybe Variable Name tree node to do.

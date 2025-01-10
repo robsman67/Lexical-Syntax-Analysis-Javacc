@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.utbm.info.da53.lw2.syntaxtree;
+package fr.utbm.info.da53.lw2.syntaxtree.binaryOperatorTreeNode;
 
 import fr.utbm.info.da53.lw2.context.ExecutionContext;
 import fr.utbm.info.da53.lw2.error.InterpreterErrorType;
@@ -51,12 +51,13 @@ public class AdditionTreeNode extends AbstractBinaryOperatorTreeNode {
 		if (left.getType()==VariableType.STRING || right.getType()==VariableType.STRING) {
 			return new Value(left.getValue().toString() + right.getValue().toString());
 		}
-		
+
+		// Check if the operands are numbers
 		if (left.getType()!=VariableType.NUMBER) {
-			fail(executionContext, InterpreterErrorType.EXPECTING_NUMBER, "left operand of "+getOperatorString()); //$NON-NLS-1$
+			fail(executionContext, InterpreterErrorType.EXPECTING_NUMBER, "left operand of "+getOperatorString());
 		}
 		if (right.getType()!=VariableType.NUMBER) {
-			fail(executionContext, InterpreterErrorType.EXPECTING_NUMBER, "right operand of "+getOperatorString()); //$NON-NLS-1$
+			fail(executionContext, InterpreterErrorType.EXPECTING_NUMBER, "right operand of "+getOperatorString());
 		}
 		Number l = left.getValue(Number.class);
 		Number r = right.getValue(Number.class);
@@ -68,7 +69,7 @@ public class AdditionTreeNode extends AbstractBinaryOperatorTreeNode {
 	 */
 	@Override
 	public String getOperatorString() {
-		return "+"; //$NON-NLS-1$
+		return "+";
 	}
 
 }

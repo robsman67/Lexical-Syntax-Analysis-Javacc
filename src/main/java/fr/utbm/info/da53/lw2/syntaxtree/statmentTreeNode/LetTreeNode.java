@@ -30,6 +30,6 @@ public class LetTreeNode extends AbstractStatementTreeNode {
 
     @Override
     public String toString() {
-        return "let " + getChildAt(0) + " = " + getChildAt(1);
+        return "LET " + getChildAt(0) + " = " + getChildAt(1);
     }
 }

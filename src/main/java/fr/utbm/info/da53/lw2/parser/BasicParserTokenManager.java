@@ -3,8 +3,17 @@
 package fr.utbm.info.da53.lw2.parser;
 import java.io.StringReader;
 import java.util.SortedMap;
+import java.util.TreeMap;
 import fr.utbm.info.da53.lw2.symbol.*;
 import fr.utbm.info.da53.lw2.context.Statement;
+import fr.utbm.info.da53.lw2.error.*;
+import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.*;
+import fr.utbm.info.da53.lw2.syntaxtree.binaryOperatorTreeNode.*;
+import fr.utbm.info.da53.lw2.syntaxtree.comparaisonTreeNode.*;
+import fr.utbm.info.da53.lw2.syntaxtree.statementTreeNode.*;
+import fr.utbm.info.da53.lw2.syntaxtree.valueTreeNode.*;
+import fr.utbm.info.da53.lw2.type.Value;
+import fr.utbm.info.da53.lw2.type.NumberUtil;
 
 /** Token Manager. */
 @SuppressWarnings ("unused")
@@ -674,6 +683,9 @@ public Token getNextToken()
       matchedToken = jjFillToken();
       return matchedToken;
    }
+   image = jjimage;
+   image.setLength(0);
+   jjimageLen = 0;
 
    try { input_stream.backup(0);
       while (curChar <= 32 && (0x100002200L & (1L << curChar)) != 0L)
@@ -690,6 +702,7 @@ public Token getNextToken()
       if ((jjtoToken[jjmatchedKind >> 6] & (1L << (jjmatchedKind & 077))) != 0L)
       {
          matchedToken = jjFillToken();
+         TokenLexicalActions(matchedToken);
          return matchedToken;
       }
       else
@@ -741,6 +754,11 @@ void TokenLexicalActions(Token matchedToken)
 {
    switch(jjmatchedKind)
    {
+      case 5 :
+        image.append(jjstrLiteralImages[5]);
+        lengthOfMatch = jjstrLiteralImages[5].length();
+                      System.out.println("CR token recognized");
+         break;
       default :
          break;
    }

@@ -4,9 +4,22 @@ package fr.utbm.info.da53.lw2.parser;
 
 import java.io.StringReader;
 import java.util.SortedMap;
+import java.util.TreeMap;
+
 
 import fr.utbm.info.da53.lw2.symbol.*;
 import fr.utbm.info.da53.lw2.context.Statement;
+import fr.utbm.info.da53.lw2.error.*;
+import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.*;
+import fr.utbm.info.da53.lw2.syntaxtree.binaryOperatorTreeNode.*;
+import fr.utbm.info.da53.lw2.syntaxtree.comparaisonTreeNode.*;
+import fr.utbm.info.da53.lw2.syntaxtree.statementTreeNode.*;
+import fr.utbm.info.da53.lw2.syntaxtree.valueTreeNode.*;
+import fr.utbm.info.da53.lw2.type.Value;
+import fr.utbm.info.da53.lw2.type.NumberUtil;
+
+
+
 
 
 public class BasicParser implements BasicParserConstants {
@@ -15,6 +28,8 @@ public class BasicParser implements BasicParserConstants {
 
     private int lineTracker = 1;
         private final SymbolTable symbolTable = new SymbolTable();
+    private final SortedMap<Integer,Statement> program = new TreeMap<Integer,Statement>();
+
 
     public BasicParser() {
     }
@@ -24,12 +39,6 @@ public class BasicParser implements BasicParserConstants {
         }
 
 
-    public void parse(String input) throws ParseException {
-        BasicParser parser = new BasicParser(new StringReader(input));
-        parser.S(); // Start parsing from the grammar's start symbol
-        System.out.println("Syntax is correct!");
-    }
-
     public int getLineTrackerumber(){
         return this.lineTracker;
     }
@@ -38,45 +47,50 @@ public class BasicParser implements BasicParserConstants {
         this.lineTracker++;
     }
 
-    public SortedMap<Integer,Statement> executeCompiler (){
+    public SortedMap<Integer,Statement> executeCompiler () throws CompilerException, ParseException {
         System.out.println("Execute Compiler");
-        SortedMap<Integer,Statement> sortedMap = null;
-        return sortedMap;
+        this.symbolTable.clear();
+        statements(program);
+        return program;
     }
 
 // Put it a the end in order to reconize it at lastly.
 
 // Grammar Rules from the course
   final public 
-void S() throws ParseException {
-    statements();
+
+void statements(SortedMap<Integer,Statement> program) throws ParseException, CompilerException {
+    lineOfCode(program);
+    restOfStatements(program);
+System.out.println("Statement");
 }
 
-  final public void statements() throws ParseException {
-    lineOfCode();
-    restOfStatements();
-}
-
-  final public void restOfStatements() throws ParseException {
+  final public void restOfStatements(SortedMap<Integer,Statement> program) throws ParseException, CompilerException {
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case CR:{
       jj_consume_token(CR);
-      lineOfCode();
-      restOfStatements();
+      lineOfCode(program);
+      restOfStatements(program);
+System.out.println("Rest of statement");
       break;
       }
     default:
       jj_la1[0] = jj_gen;
-
+System.out.println("Rest of statement");
     }
 }
 
-  final public void lineOfCode() throws ParseException {
+  final public void lineOfCode(SortedMap<Integer,Statement> program) throws ParseException, CompilerException {Token x;
+     AbstractStatementTreeNode stmt;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case NUMBER:{
-      jj_consume_token(NUMBER);
-      statement();
-this.incrementLineTracker();
+      x = jj_consume_token(NUMBER);
+      stmt = statement();
+int lineNumber = NumberUtil.parseInt(x.image);
+        if (lineNumber < 0) {if (true) throw new CompilerException(CompilationErrorType.INVALID_LINE_NUMBER, getLineTrackerumber(), "Negative number line Value");}
+        if (stmt != null) program.put(lineNumber, stmt);
+        this.incrementLineTracker();
+        System.out.println("Line of code " + getLineTrackerumber());
       break;
       }
     case PRINT:
@@ -87,10 +101,10 @@ this.incrementLineTracker();
     case GOSUB:
     case END:
     case IF:
-    case WHILE:
-    case FOR:{
-      statement();
-this.incrementLineTracker();
+    case WHILE:{
+      stmt = statement();
+if (stmt != null) program.put(this.lineTracker, stmt);
+        this.incrementLineTracker();
       break;
       }
     default:
@@ -100,83 +114,102 @@ this.incrementLineTracker();
     }
 }
 
-  final public void statement() throws ParseException {Token x;
+  final public AbstractStatementTreeNode statement() throws ParseException, CompilerException {Token x;
+        AbstractValueTreeNode leftExpr, rightExpr, var, expr;
+        AbstractStatementTreeNode stmt, thenStmt, elseStmt;
+        AbstractComparisonOperatorTreeNode re;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case PRINT:{
       jj_consume_token(PRINT);
-      expression();
-this.symbolTable.declare("print", this.getLineTrackerumber());
+      expr = expression();
+if(expr == null) {
+            {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting expression");}
+        }
         System.out.println("Print statement " + getLineTrackerumber());
+        //this.symbolTable.declare("print", this.getLineTrackerumber());
+        //System.out.println("Print statement " + getLineTrackerumber());
+        {if ("" != null) return new PrintTreeNode(expr);}
       break;
       }
     case GOTO:{
       jj_consume_token(GOTO);
-      expression();
+      expr = expression();
+{if ("" != null) return new GotoTreeNode(expr);}
       break;
       }
     case INPUT:{
       jj_consume_token(INPUT);
-      var_list();
+      var = factor();
+{if ("" != null) return new InputTreeNode(var);}
       break;
       }
     case LET:{
       jj_consume_token(LET);
-      x = jj_consume_token(IDENTIFIER);
-      arrayIndex();
+      var = factor();
       jj_consume_token(EQ);
-      expression();
-if (this.symbolTable.contains(x.image)) {
-            System.out.println("Variable already exists: " + x.image);
-        } else {
-            this.symbolTable.declare(x.image, this.getLineTrackerumber());
-            System.out.println("Declared variable: " + x.image);
+      expr = expression();
+if(var == null) {
+            {if (true) throw new CompilerException(CompilationErrorType.SYNTAX_ERROR, this.getLineTrackerumber(), "Expecting variable");}
+        } else if (expr == null) {
+            {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting expression");}
         }
+        {if ("" != null) return new LetTreeNode(var.toString(), expr);}
       break;
       }
     case GOSUB:{
       jj_consume_token(GOSUB);
-      expression();
+      expr = expression();
+{if ("" != null) return new GosubTreeNode(expr);}
       break;
       }
     case RETURN:{
       jj_consume_token(RETURN);
+{if ("" != null) return new ReturnTreeNode();}
       break;
       }
     case END:{
       jj_consume_token(END);
+{if ("" != null) return new EndTreeNode();}
       break;
       }
     case IF:{
       jj_consume_token(IF);
-      expression();
-      relop();
-      expression();
+      leftExpr = expression();
+      re = relop();
+      rightExpr = expression();
       jj_consume_token(THEN);
-      statement();
-      elseStatement();
+      thenStmt = statement();
+      elseStmt = statement();
+if(leftExpr == null || rightExpr == null) {
+            {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting expression");}
+        } else if (re == null) {
+            {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_COMPARISON_OPERATOR, this.getLineTrackerumber(), "Expecting relop");}
+        } else if (thenStmt == null) {
+            {if (true) throw new CompilerException(CompilationErrorType.NO_STATEMENT_IN_THEN_BLOCK, this.getLineTrackerumber(), "Expecting then");}
+            {if ("" != null) return null;}
+        }
+        re.setOperands(leftExpr, rightExpr);
+        {if ("" != null) return new IfThenTreeNode(re , thenStmt, elseStmt);}
       break;
       }
     case WHILE:{
       jj_consume_token(WHILE);
-      expression();
-      relop();
-      expression();
+      leftExpr = expression();
+      re = relop();
+      rightExpr = expression();
       jj_consume_token(DO);
-      statement();
+      stmt = statement();
       jj_consume_token(WEND);
-      break;
-      }
-    case FOR:{
-      jj_consume_token(FOR);
-      jj_consume_token(IDENTIFIER);
-      jj_consume_token(EQ);
-      expression();
-      jj_consume_token(TO);
-      expression();
-      forStep();
-      statement();
-      jj_consume_token(NEXT);
-      jj_consume_token(IDENTIFIER);
+if(leftExpr == null || rightExpr == null) {
+            {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting expression");}
+        } else if (re == null) {
+            {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_COMPARISON_OPERATOR, this.getLineTrackerumber(), "Expecting relop");}
+        } else if (stmt == null) {
+            {if (true) throw new CompilerException(CompilationErrorType.NO_STATEMENT_IN_WHILE_BLOCK, this.getLineTrackerumber(), "Expecting then");}
+            {if ("" != null) return null;}
+        }
+        re.setOperands(leftExpr, rightExpr);
+        {if ("" != null) return new WhileTreeNode(re, stmt);}
       break;
       }
     default:
@@ -184,241 +217,208 @@ if (this.symbolTable.contains(x.image)) {
       jj_consume_token(-1);
       throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
 }
 
-  final public void elseStatement() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case ELSE:{
-      jj_consume_token(ELSE);
-      statement();
-      break;
-      }
-    default:
-      jj_la1[3] = jj_gen;
-
-    }
-}
-
-  final public void forStep() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case STEP:{
-      jj_consume_token(STEP);
-      expression();
-      break;
-      }
-    default:
-      jj_la1[4] = jj_gen;
-
-    }
-}
-
-  final public void relop() throws ParseException {
+  final public AbstractComparisonOperatorTreeNode relop() throws ParseException, ParseException, CompilerException {
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case DIFF:{
       jj_consume_token(DIFF);
+{if ("" != null) return new NotEqualTreeNode();}
       break;
       }
     case LE:{
       jj_consume_token(LE);
+{if ("" != null) return new LowerEqualTreeNode();}
       break;
       }
     case GE:{
       jj_consume_token(GE);
+{if ("" != null) return new GreaterEqualTreeNode();}
       break;
       }
     case EQ:{
       jj_consume_token(EQ);
+{if ("" != null) return new EqualTreeNode();}
       break;
       }
     case LT:{
       jj_consume_token(LT);
+{if ("" != null) return new LowerThanTreeNode();}
       break;
       }
     case GT:{
       jj_consume_token(GT);
+{if ("" != null) return new GreaterThanTreeNode();}
       break;
       }
     default:
-      jj_la1[5] = jj_gen;
+      jj_la1[3] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
 }
 
-  final public void var_list() throws ParseException {
-    jj_consume_token(IDENTIFIER);
-    arrayIndex();
-    var_list_opt();
+  final public AbstractValueTreeNode expression() throws ParseException, ParseException, CompilerException {AbstractValueTreeNode leftOp, expr;
+    leftOp = term();
+    expr = expression_end(leftOp);
+if (leftOp == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_LEFT_OPERAND, this.getLineTrackerumber(), "Expecting a left operand");}
+        else if (expr == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting an expression");}
+        else {if ("" != null) return expr;}
+    throw new Error("Missing return statement in function");
 }
 
-  final public void var_list_opt() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case COMA:{
-      jj_consume_token(COMA);
-      jj_consume_token(IDENTIFIER);
-      arrayIndex();
-      var_list_opt();
-      break;
-      }
-    default:
-      jj_la1[6] = jj_gen;
-
-    }
-}
-
-  final public void arrayIndex() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case OPEN_PARENT:{
-      jj_consume_token(OPEN_PARENT);
-      expression();
-      jj_consume_token(CLOSE_PARENT);
-      break;
-      }
-    default:
-      jj_la1[7] = jj_gen;
-
-    }
-}
-
-  final public void expression() throws ParseException {
-    term();
-    expression_end();
-}
-
-  final public void expression_end() throws ParseException {
+  final public AbstractValueTreeNode expression_end(AbstractValueTreeNode leftOp) throws ParseException, ParseException, CompilerException {AbstractValueTreeNode rightOp, expr;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case PLUS:{
       jj_consume_token(PLUS);
-      term();
-      expression_end();
+      rightOp = term();
+      expr = expression_end(leftOp);
+if (rightOp == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_RIGHT_OPERAND, this.getLineTrackerumber(), "Expecting a right operand");}
+        else if (expr == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting an expression");}
+        else {if ("" != null) return new AdditionTreeNode(leftOp, rightOp);}
       break;
       }
     case MINUS:{
       jj_consume_token(MINUS);
-      term();
-      expression_end();
+      rightOp = term();
+      expr = expression_end(leftOp);
+if (rightOp == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_RIGHT_OPERAND, this.getLineTrackerumber(), "Expecting a right operand");}
+        else if (expr == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting an expression");}
+        else {if ("" != null) return new SubtractionTreeNode(leftOp, rightOp);}
       break;
       }
-    default:
-      jj_la1[8] = jj_gen;
-
-    }
-}
-
-  final public void term() throws ParseException {
-    iterm();
-    term_end();
-}
-
-  final public void term_end() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case MULTIPLY:{
-      jj_consume_token(MULTIPLY);
-      iterm();
-      term_end();
-      break;
-      }
-    case DIVIDE:{
-      jj_consume_token(DIVIDE);
-      iterm();
-      term_end();
-      break;
-      }
-    default:
-      jj_la1[9] = jj_gen;
-
-    }
-}
-
-  final public void iterm() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case NUMBER:
-    case OPEN_PARENT:
-    case NOT:
-    case FALSE:
-    case TRUE:
-    case STRING:
-    case UNDEF:
-    case IDENTIFIER:{
-      factor();
-      iterm_end();
-      break;
-      }
-    default:
-      jj_la1[10] = jj_gen;
-
-    }
-}
-
-  final public void iterm_end() throws ParseException {
-    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case AND:{
       jj_consume_token(AND);
-      factor();
-      iterm_end();
+      rightOp = term();
+      expr = expression_end(leftOp);
+if (rightOp == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_RIGHT_OPERAND, this.getLineTrackerumber(), "Expecting a right operand");}
+        else if (expr == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting an expression");}
+        else {if ("" != null) return new BooleanAndTreeNode(leftOp, rightOp);}
       break;
       }
     case OR:{
       jj_consume_token(OR);
-      factor();
-      iterm_end();
+      rightOp = term();
+      expr = expression_end(leftOp);
+if (rightOp == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_RIGHT_OPERAND, this.getLineTrackerumber(), "Expecting a right operand");}
+        else if (expr == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting an expression");}
+        else {if ("" != null) return new BooleanOrTreeNode(leftOp, rightOp);}
       break;
       }
     case XOR:{
       jj_consume_token(XOR);
-      factor();
-      iterm_end();
+      rightOp = term();
+      expr = expression_end(leftOp);
+if (rightOp == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_RIGHT_OPERAND, this.getLineTrackerumber(), "Expecting a right operand");}
+        else if (expr == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting an expression");}
+        else {if ("" != null) return new BooleanXorTreeNode(leftOp, rightOp);}
       break;
       }
     default:
-      jj_la1[11] = jj_gen;
-
+      jj_la1[4] = jj_gen;
+{if ("" != null) return leftOp;}
     }
+    throw new Error("Missing return statement in function");
 }
 
-  final public void factor() throws ParseException {
+  final public AbstractValueTreeNode term() throws ParseException, ParseException, CompilerException {AbstractValueTreeNode leftOp, term;
+    leftOp = factor();
+    term = term_end(leftOp);
+if (leftOp == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_LEFT_OPERAND, this.getLineTrackerumber(), "Expecting a left operand");}
+        else if (term == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting an expression");}
+        else {if ("" != null) return term;}
+    throw new Error("Missing return statement in function");
+}
+
+// Prirority of the operator
+  final public AbstractValueTreeNode term_end(AbstractValueTreeNode leftOp) throws ParseException, ParseException, CompilerException {AbstractValueTreeNode rightOp, term;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case MULTIPLY:{
+      jj_consume_token(MULTIPLY);
+      rightOp = factor();
+      term = term_end(leftOp);
+if (rightOp == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_RIGHT_OPERAND, this.getLineTrackerumber(), "Expecting a right operand");}
+        else if (term == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting an expression");}
+        else {if ("" != null) return new MultiplicationTreeNode(leftOp, rightOp);}
+      break;
+      }
+    case DIVIDE:{
+      jj_consume_token(DIVIDE);
+      rightOp = factor();
+      term = term_end(leftOp);
+if (rightOp == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_RIGHT_OPERAND, this.getLineTrackerumber(), "Expecting a right operand");}
+        else if (term == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting an expression");}
+        else {if ("" != null) return new DivisionTreeNode(leftOp, rightOp);}
+      break;
+      }
+    default:
+      jj_la1[5] = jj_gen;
+{if ("" != null) return leftOp;}
+    }
+    throw new Error("Missing return statement in function");
+}
+
+  final public AbstractValueTreeNode factor() throws ParseException, ParseException, CompilerException {AbstractValueTreeNode expr, var;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case OPEN_PARENT:{
       jj_consume_token(OPEN_PARENT);
-      expression();
+      expr = expression();
       jj_consume_token(CLOSE_PARENT);
+if (expr == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting an expression");}
+        else {if ("" != null) return expr;}
       break;
       }
     case NOT:{
       jj_consume_token(NOT);
-      expression();
+      expr = expression();
+if (expr == null) {if (true) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting an expression");}
+        else {if ("" != null) return new BooleanNotTreeNode(expr);}
       break;
       }
     case NUMBER:{
       jj_consume_token(NUMBER);
+Token t = jj_consume_token(NUMBER);
+        {if ("" != null) return new NumberTreeNode(new Value(t.image));}
       break;
       }
     case STRING:{
       jj_consume_token(STRING);
+Token t = jj_consume_token(STRING);
+        {if ("" != null) return new StringTreeNode(new Value(t.image));}
       break;
       }
     case TRUE:{
       jj_consume_token(TRUE);
+jj_consume_token(TRUE);
+        {if ("" != null) return new BooleanTreeNode(true);}
       break;
       }
     case FALSE:{
       jj_consume_token(FALSE);
+jj_consume_token(FALSE);
+        {if ("" != null) return new BooleanTreeNode(false);}
       break;
       }
     case UNDEF:{
       jj_consume_token(UNDEF);
+jj_consume_token(UNDEF);
+        {if ("" != null) return new UndefTreeNode();}
       break;
       }
     case IDENTIFIER:{
       jj_consume_token(IDENTIFIER);
-      arrayIndex();
+Token t = jj_consume_token(IDENTIFIER);
+        {if ("" != null) return new IdentifierTreeNode(t.image);}
       break;
       }
     default:
-      jj_la1[12] = jj_gen;
+      jj_la1[6] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
 }
 
   /** Generated Token Manager. */
@@ -430,7 +430,7 @@ if (this.symbolTable.contains(x.image)) {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[13];
+  final private int[] jj_la1 = new int[7];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -438,10 +438,10 @@ if (this.symbolTable.contains(x.image)) {
 	   jj_la1_init_1();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x20,0x19fe40,0x19fe00,0x40000,0x400000,0xfc000000,0x0,0x80,0x0,0x0,0xc0,0x0,0xc0,};
+	   jj_la1_0 = new int[] {0x20,0x9fe40,0x9fe00,0xfc000000,0x0,0x0,0xc0,};
 	}
 	private static void jj_la1_init_1() {
-	   jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x400,0x0,0x3,0xc,0x3b80,0x70,0x3b80,};
+	   jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x73,0xc,0x3b80,};
 	}
 
   /** Constructor with InputStream. */
@@ -455,7 +455,7 @@ if (this.symbolTable.contains(x.image)) {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 7; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -469,7 +469,7 @@ if (this.symbolTable.contains(x.image)) {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 7; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -479,7 +479,7 @@ if (this.symbolTable.contains(x.image)) {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 7; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -497,7 +497,7 @@ if (this.symbolTable.contains(x.image)) {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 7; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -506,7 +506,7 @@ if (this.symbolTable.contains(x.image)) {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 7; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -515,7 +515,7 @@ if (this.symbolTable.contains(x.image)) {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 13; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 7; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -571,7 +571,7 @@ if (this.symbolTable.contains(x.image)) {
 	   la1tokens[jj_kind] = true;
 	   jj_kind = -1;
 	 }
-	 for (int i = 0; i < 13; i++) {
+	 for (int i = 0; i < 7; i++) {
 	   if (jj_la1[i] == jj_gen) {
 		 for (int j = 0; j < 32; j++) {
 		   if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -614,7 +614,7 @@ if (this.symbolTable.contains(x.image)) {
 
     // Create something that goes with a symbol table.
     // Each new token goes with the declare methode
-    // 
+    //
 
 
 }

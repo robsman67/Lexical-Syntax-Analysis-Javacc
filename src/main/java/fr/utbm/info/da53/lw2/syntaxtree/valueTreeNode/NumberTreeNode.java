@@ -7,9 +7,15 @@ import fr.utbm.info.da53.lw2.type.Value;
 
 public class NumberTreeNode extends AbstractValueTreeNode {
 
-    //private final Value number;
+    private final Value number;
 
-    //TODO constructor
+    public NumberTreeNode(Value number) {
+        this.number = number;
+    }
+
+    public Value getNumber() {
+        return number;
+    }
 
     /**
      * Evaluate and replies the value.
@@ -20,12 +26,11 @@ public class NumberTreeNode extends AbstractValueTreeNode {
      */
     @Override
     public Value evaluate(ExecutionContext executionContext) throws InterpreterException {
-        return null;
+        return this.number;
     }
 
-//    @Override
-//    public String toString() {
-//        return this.number.toString();
-//    }
-
+    @Override
+    public String toString() {
+        return this.number.toString();
+    }
 }

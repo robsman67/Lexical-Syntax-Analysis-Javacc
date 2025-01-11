@@ -1,16 +1,15 @@
-package fr.utbm.info.da53.lw2.syntaxtree.statmentTreeNode;
+package fr.utbm.info.da53.lw2.syntaxtree.statementTreeNode;
 
 import fr.utbm.info.da53.lw2.context.ExecutionContext;
 import fr.utbm.info.da53.lw2.error.InterpreterException;
 import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractStatementTreeNode;
 import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractValueTreeNode;
 
-public class GotoTreeNode extends AbstractStatementTreeNode {
+public class InputTreeNode extends AbstractStatementTreeNode {
 
-    public GotoTreeNode(AbstractValueTreeNode line){
-        setChildren(line);
+    public InputTreeNode(AbstractValueTreeNode variable) {
+        setChildren(variable);
     }
-
 
     /**
      * Run the statement.
@@ -24,8 +23,10 @@ public class GotoTreeNode extends AbstractStatementTreeNode {
         return null;
     }
 
+
     @Override
     public String toString() {
-        return "GOTO " + getChildAt(0).toString();
+        return "input " + getChildAt(0);
     }
+
 }

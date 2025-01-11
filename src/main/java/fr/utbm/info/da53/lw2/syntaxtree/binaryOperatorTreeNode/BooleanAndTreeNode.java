@@ -3,11 +3,13 @@ package fr.utbm.info.da53.lw2.syntaxtree.binaryOperatorTreeNode;
 import fr.utbm.info.da53.lw2.context.ExecutionContext;
 import fr.utbm.info.da53.lw2.error.InterpreterException;
 import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractBinaryOperatorTreeNode;
+import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractValueTreeNode;
 import fr.utbm.info.da53.lw2.type.Value;
 
 public class BooleanAndTreeNode extends AbstractBinaryOperatorTreeNode {
 
-    public BooleanAndTreeNode() {
+    public BooleanAndTreeNode(AbstractValueTreeNode left, AbstractValueTreeNode right) {
+        super(left, right);
     }
 
     /**

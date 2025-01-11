@@ -3,9 +3,14 @@ package fr.utbm.info.da53.lw2.syntaxtree.binaryOperatorTreeNode;
 import fr.utbm.info.da53.lw2.context.ExecutionContext;
 import fr.utbm.info.da53.lw2.error.InterpreterException;
 import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractBinaryOperatorTreeNode;
+import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractValueTreeNode;
 import fr.utbm.info.da53.lw2.type.Value;
 
 public class BooleanOrTreeNode extends AbstractBinaryOperatorTreeNode {
+
+    public BooleanOrTreeNode(AbstractValueTreeNode left, AbstractValueTreeNode right) {
+        super(left, right);
+    }
 
     /**
      * Compute the result.
@@ -24,7 +29,7 @@ public class BooleanOrTreeNode extends AbstractBinaryOperatorTreeNode {
     /**
      * Replies the operator as a string.
      *
-     * @return the operato	r.
+     * @return the operator.
      */
     @Override
     public String getOperatorString() {

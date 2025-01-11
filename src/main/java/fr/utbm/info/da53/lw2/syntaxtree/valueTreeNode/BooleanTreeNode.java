@@ -8,9 +8,12 @@ import fr.utbm.info.da53.lw2.type.Value;
 public class BooleanTreeNode extends AbstractValueTreeNode {
 
 
-    //private final Value booleanValue;
+    private final Value booleanValue;
 
-    //TODO constructor
+
+    public BooleanTreeNode(Boolean bool) {
+        this.booleanValue = new Value(Boolean.valueOf(bool));
+    }
 
     /**
      * Evaluate and replies the value.
@@ -21,11 +24,11 @@ public class BooleanTreeNode extends AbstractValueTreeNode {
      */
     @Override
     public Value evaluate(ExecutionContext executionContext) throws InterpreterException {
-        return null;
+        return this.booleanValue;
     }
 
-//    @Override
-//    public String toString() {
-//        return this.literal.getValue().toString();
-//    }
+    @Override
+    public String toString() {
+        return this.booleanValue.toString();
+    }
 }

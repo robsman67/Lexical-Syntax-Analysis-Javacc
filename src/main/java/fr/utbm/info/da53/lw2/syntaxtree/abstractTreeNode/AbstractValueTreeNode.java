@@ -30,7 +30,9 @@ import fr.utbm.info.da53.lw2.type.Value;
  * @version $Name$ $Revision$ $Date$
  */
 public abstract class AbstractValueTreeNode extends AbstractSyntaxTreeNode {
-	
+
+	public AbstractValueTreeNode toString;
+
 	/**
 	 */
 	public AbstractValueTreeNode() {
@@ -44,5 +46,7 @@ public abstract class AbstractValueTreeNode extends AbstractSyntaxTreeNode {
 	 * @throws InterpreterException when something bad occurs during the evaluation.
 	 */
 	public abstract Value evaluate(ExecutionContext executionContext) throws InterpreterException;
-	
+
+
+	public abstract String toString();
 }

@@ -1,14 +1,18 @@
 package fr.utbm.info.da53.lw2.syntaxtree.valueTreeNode;
 
 import fr.utbm.info.da53.lw2.context.ExecutionContext;
+import fr.utbm.info.da53.lw2.error.InterpreterErrorType;
 import fr.utbm.info.da53.lw2.error.InterpreterException;
 import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractValueTreeNode;
 import fr.utbm.info.da53.lw2.type.Value;
 
-public class VariableTreeNode extends AbstractValueTreeNode {
+public class IdentifierTreeNode extends AbstractValueTreeNode {
 
-//    private final String identifier;
-    // TODO constructor
+    private final String identifier;
+
+    public IdentifierTreeNode(String identifier) {
+        this.identifier = identifier;
+    }
 
     /**
      * Evaluate and replies the value.
@@ -19,12 +23,16 @@ public class VariableTreeNode extends AbstractValueTreeNode {
      */
     @Override
     public Value evaluate(ExecutionContext executionContext) throws InterpreterException {
-        return null;
+        Value value = executionContext.getSymbolTableEntry(this.identifier).getValue();
+        if (value == null) {
+            fail(executionContext, InterpreterErrorType.UNSET_VALUE, "Undefined identifier: " + this.identifier);
+        }
+        return value;
     }
 
-//    @Override
-//    public String toString() {
-//        return this.identifier;
-//    }
+    @Override
+    public String toString() {
+        return this.identifier;
+    }
 }
 

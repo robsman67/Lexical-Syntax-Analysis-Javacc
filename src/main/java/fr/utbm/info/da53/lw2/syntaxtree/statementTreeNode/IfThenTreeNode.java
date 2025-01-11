@@ -1,4 +1,4 @@
-package fr.utbm.info.da53.lw2.syntaxtree.statmentTreeNode;
+package fr.utbm.info.da53.lw2.syntaxtree.statementTreeNode;
 
 import fr.utbm.info.da53.lw2.context.ExecutionContext;
 import fr.utbm.info.da53.lw2.error.InterpreterErrorType;
@@ -35,6 +35,8 @@ public class IfThenTreeNode extends AbstractStatementTreeNode {
                 if(thenStatement != null) {
                     return thenStatement.run(context);
                 }
+
+                // We don't need to have a new elseTreeNode, we check everything here
             }else {
                 // If the condition is false, we execute the else statement.
                 if(elseStatement != null) {

@@ -8,9 +8,15 @@ import fr.utbm.info.da53.lw2.type.Value;
 public class StringTreeNode extends AbstractValueTreeNode {
 
 
-    //private final Value stringValue;
+    private final Value stringValue;
 
-    //TODO constructor
+    public StringTreeNode(Value stringValue) {
+        this.stringValue = stringValue;
+    }
+
+    public Value getStringValue() {
+        return stringValue;
+    }
 
     /**
      * Evaluate and replies the value.
@@ -21,8 +27,12 @@ public class StringTreeNode extends AbstractValueTreeNode {
      */
     @Override
     public Value evaluate(ExecutionContext executionContext) throws InterpreterException {
-        return null;
+        return this.stringValue;
     }
 
+    @Override
+    public String toString() {
+        return this.stringValue.toString();
+    }
 
 }

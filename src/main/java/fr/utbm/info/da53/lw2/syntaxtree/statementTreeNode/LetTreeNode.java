@@ -1,16 +1,19 @@
-package fr.utbm.info.da53.lw2.syntaxtree.statmentTreeNode;
+package fr.utbm.info.da53.lw2.syntaxtree.statementTreeNode;
 
 import fr.utbm.info.da53.lw2.context.ExecutionContext;
 import fr.utbm.info.da53.lw2.error.InterpreterException;
 import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractStatementTreeNode;
 import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractValueTreeNode;
 
-public class ForTreeNode extends AbstractStatementTreeNode {
+public class LetTreeNode extends AbstractStatementTreeNode {
 
-    public ForTreeNode (AbstractStatementTreeNode init, AbstractValueTreeNode condition, AbstractStatementTreeNode increment, AbstractStatementTreeNode body){
-        setChildren(init, condition, increment, body);
+   private final String variableName;
+
+
+    public LetTreeNode (String variableName, AbstractValueTreeNode value) {
+        this.variableName = variableName;
+        setChildren(value);
     }
-
 
     /**
      * Run the statement.
@@ -21,11 +24,12 @@ public class ForTreeNode extends AbstractStatementTreeNode {
      */
     @Override
     public ExecutionContext run(ExecutionContext context) throws InterpreterException {
+        if (variableName != null) {}
         return null;
     }
 
     @Override
     public String toString() {
-        return "for " + getChildAt(0) + " ; " + getChildAt(1) + " ; " + getChildAt(2) + " do " + getChildAt(3);
+        return "LET " + getChildAt(0) + " = " + getChildAt(1);
     }
 }

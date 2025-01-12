@@ -1,8 +1,12 @@
 options {
   IGNORE_CASE = true;
   STATIC = false;
-} 
+}
 
+/**
+ * BasicParser
+ * @Author: Robert Hakobyan
+ */
 
 PARSER_BEGIN(BasicParser)
 
@@ -11,7 +15,6 @@ package fr.utbm.info.da53.lw2.parser;
 import java.io.StringReader;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 
 import fr.utbm.info.da53.lw2.symbol.*;
 import fr.utbm.info.da53.lw2.context.Statement;
@@ -24,195 +27,166 @@ import fr.utbm.info.da53.lw2.syntaxtree.valueTreeNode.*;
 import fr.utbm.info.da53.lw2.type.Value;
 import fr.utbm.info.da53.lw2.type.NumberUtil;
 
-
-
-
-
 public class BasicParser {
 
     private String testChecker;
-
     private int lineTracker = 1;
-	private final SymbolTable symbolTable = new SymbolTable();
-    private final SortedMap<Integer,Statement> program = new TreeMap<Integer,Statement>();
+    private final SymbolTable symbolTable = new SymbolTable();
+    private final SortedMap<Integer, Statement> program = new TreeMap<Integer, Statement>();
 
-
-    public BasicParser() {
+    public SymbolTable getSymbolTable() {
+        return this.symbolTable;
     }
 
-	public SymbolTable getSymbolTable() {
-		return this.symbolTable;
-	}
-
-
-    public int getLineTrackerumber(){
+    public int getLineTrackerumber() {
         return this.lineTracker;
     }
 
-    public void incrementLineTracker(){
+    public void incrementLineTracker() {
         this.lineTracker++;
     }
 
-    public SortedMap<Integer,Statement> executeCompiler () throws CompilerException, ParseException {
+    public SortedMap<Integer, Statement> getCode() {
+        return this.program;
+    }
+
+    public SortedMap<Integer, Statement> executeCompiler() throws CompilerException, ParseException {
         System.out.println("Execute Compiler");
         this.symbolTable.clear();
         statements(program);
         return program;
     }
-
-
-
-    // Create something that goes with a symbol table.
-    // Each new token goes with the declare methode
-    //
-
-
 }
+
 
 PARSER_END(BasicParser)
 
 // *** The skip Token with the comment token
-
-SKIP:  { " " | "\t" | "\r" | <"REM" ((" "|"\t")(~["\n","\r"])*)? ("\n" | "\r" | "\r\n" | "\n\r")> }
-
+SKIP: { " " | "\t" | "\r" | <"REM" ((" " | "\t")(~["\n", "\r"])*)? ("\n" | "\r" | "\r\n" | "\n\r")> }
 
 // *** Token Definitions
-
-
 TOKEN: { <CR: "\n"> { System.out.println("CR token recognized"); } }
 
-// Number token
-TOKEN: { <NUMBER : (["0"-"9"])+ ("." (["0"-"9"])+)?>
-        | <OPEN_PARENT: "(">
-        | <CLOSE_PARENT: ")">
-
-        }
-
-
 // Keyword token
-
 TOKEN: { <PRINT: "print">
-        | <GOTO: "goto">
-        | <INPUT: "input">
-        | <LET: "let">
-        | <RETURN: "return">
-        | <GOSUB: "gosub">
-        | <END: "end">
-        | <IF: "if">
-        | <THEN: "then">
-        | <ELSE: "else">
-        | <WHILE: "while">
-        | <FOR: "for">
-        | <TO: "to">
-        | <STEP: "step">
-        | <NEXT: "next">
-        | <DO: "do">
-        | <WEND: "wend">
-        }
+       | <GOTO: "goto">
+       | <INPUT: "input">
+       | <LET: "let">
+       | <RETURN: "return">
+       | <GOSUB: "gosub">
+       | <END: "end">
+       | <IF: "if">
+       | <THEN: "then">
+       | <ELSE: "else">
+       | <WHILE: "while">
+       | <FOR: "for">
+       | <TO: "to">
+       | <STEP: "step">
+       | <NEXT: "next">
+       | <DO: "do">
+       | <WEND: "wend">
+       }
+
+// Number token
+TOKEN: { <NUMBER: (["0"-"9"])+ ("." (["0"-"9"])+)?> { System.out.println("Number token recognized"); }
+       | <OPEN_PARENT: "(">
+       | <CLOSE_PARENT: ")">
+       }
+
 // Relop token
-
 TOKEN: { <DIFF: "<>">
-        | <EQ: "=">
-        | <LE: "<=">
-        | <GE: ">=">
-        | <LT: "<">
-        | <GT: ">">
-        | <PLUS: "+">
-        | <MINUS: "-">
-        | <MULTIPLY: "*">
-        | <DIVIDE: "/">
-        | <AND: "and">
-        | <OR: "or">
-        | <XOR: "xor">
-        | <NOT: "not">
-        | <FALSE: "false">
-        | <TRUE: "true">
-         }
-
+       | <EQ: "=">
+       | <LE: "<=">
+       | <GE: ">=">
+       | <LT: "<">
+       | <GT: ">">
+       | <PLUS: "+">
+       | <MINUS: "-">
+       | <MULTIPLY: "*">
+       | <DIVIDE: "/">
+       | <AND: "and">
+       | <OR: "or">
+       | <XOR: "xor">
+       | <NOT: "not">
+       | <FALSE: "false">
+       | <TRUE: "true">
+       }
 
 // Other Token
-TOKEN: { <COMA: ",">
-        | <STRING: "\"" (~["\""])* "\"" >
-        | <UNDEF: "undef">
-        }
+TOKEN: { <STRING: "\"" (~["\""])* "\"">
+       | <UNDEF: "undef">
+       }
 
-TOKEN: { <IDENTIFIER: ["a"-"z", "A"-"Z"](["a"-"z", "A"-"Z", "0"-"9"])*> } // Put it a the end in order to reconize it at lastly.
+TOKEN: { <IDENTIFIER: ["a"-"z", "A"-"Z"](["a"-"z", "A"-"Z", "0"-"9"])*> } // Put it at the end to recognize it last.
 
-// Grammar Rules from the course
-
-
-void statements(SortedMap<Integer,Statement> program) throws CompilerException: {}
+// Grammar Rules
+void statements(SortedMap<Integer, Statement> program) throws CompilerException: {}
 {
-    lineOfCode(program) restOfStatements(program) {System.out.println("Statement");}
+    lineOfCode(program) restOfStatements(program) { System.out.println("Statement"); }
 }
 
-void restOfStatements(SortedMap<Integer,Statement> program) throws CompilerException: {}
+void restOfStatements(SortedMap<Integer, Statement> program) throws CompilerException: {}
 {
-    <CR> lineOfCode(program) restOfStatements(program) {System.out.println("Rest of statement");}
-    |
-    {
-        System.out.println("Rest of statement");
-}
+    <CR> lineOfCode(program) restOfStatements(program)
+    | {}
 }
 
-void lineOfCode(SortedMap<Integer,Statement> program) throws CompilerException : {
-     Token x;
-     AbstractStatementTreeNode stmt;
-} // We can increment line number here.
+void lineOfCode(SortedMap<Integer, Statement> program) throws CompilerException: {
+    Token x;
+    AbstractStatementTreeNode stmt;
+}
 {
-    x =  <NUMBER> stmt = statement() {
+    x = <NUMBER> stmt = statement()
+     {
         int lineNumber = NumberUtil.parseInt(x.image);
         if (lineNumber < 0) throw new CompilerException(CompilationErrorType.INVALID_LINE_NUMBER, getLineTrackerumber(), "Negative number line Value");
         if (stmt != null) program.put(lineNumber, stmt);
         this.incrementLineTracker();
         System.out.println("Line of code " + getLineTrackerumber());
-        }
+     }
     |
-    stmt = statement(){
+    stmt = statement() {
         if (stmt != null) program.put(this.lineTracker, stmt);
         this.incrementLineTracker();
-
+        System.out.println("Line of code " + getLineTrackerumber());
+    }
+    |
+    { // Empty or invalid line
+        System.out.println("Skipping empty or invalid line");
+        this.incrementLineTracker();
+    }
 }
-}
 
-AbstractStatementTreeNode statement() throws CompilerException:
-{
-        Token x;
-        AbstractValueTreeNode leftExpr, rightExpr, var, expr;
-        AbstractStatementTreeNode stmt, thenStmt, elseStmt;
-        AbstractComparisonOperatorTreeNode re;
-
+AbstractStatementTreeNode statement() throws CompilerException: {
+    Token x;
+    AbstractValueTreeNode leftExpr, rightExpr, var, expr;
+    AbstractStatementTreeNode stmt, thenStmt, elseStmt;
+    AbstractComparisonOperatorTreeNode re;
 }
 {
     <PRINT> expr = expression() {
-        if(expr == null) {
-            throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting expression");
-        }
+        if (expr == null) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting expression");
         System.out.println("Print statement " + getLineTrackerumber());
-        //this.symbolTable.declare("print", this.getLineTrackerumber());
-        //System.out.println("Print statement " + getLineTrackerumber());
         return new PrintTreeNode(expr);
     }
     |
     <GOTO> expr = expression() {
+        if (expr == null) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting expression");
+        System.out.println("Goto statement " + getLineTrackerumber());
         return new GotoTreeNode(expr);
     }
-
     |
     <INPUT> var = factor() {
         return new InputTreeNode(var);
     }
     |
     <LET> var = factor() <EQ> expr = expression() {
-        if(var == null) {
-            throw new CompilerException(CompilationErrorType.SYNTAX_ERROR, this.getLineTrackerumber(), "Expecting variable");
-        } else if (expr == null) {
-            throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting expression");
-        }
+        if (var == null) throw new CompilerException(CompilationErrorType.SYNTAX_ERROR, this.getLineTrackerumber(), "Expecting variable");
+        else if (expr == null) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting expression");
         return new LetTreeNode(var.toString(), expr);
     }
     |
-    <GOSUB> expr =  expression(){
+    <GOSUB> expr = expression() {
         return new GosubTreeNode(expr);
     }
     |
@@ -224,38 +198,24 @@ AbstractStatementTreeNode statement() throws CompilerException:
         return new EndTreeNode();
     }
     |
-    <IF> leftExpr = expression() re = relop() rightExpr = expression() <THEN> thenStmt = statement() elseStmt = statement()
-    {
-        if(leftExpr == null || rightExpr == null) {
-            throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting expression");
-        } else if (re == null) {
-            throw new CompilerException(CompilationErrorType.EXPECTING_COMPARISON_OPERATOR, this.getLineTrackerumber(), "Expecting relop");
-        } else if (thenStmt == null) {
-            throw new CompilerException(CompilationErrorType.NO_STATEMENT_IN_THEN_BLOCK, this.getLineTrackerumber(), "Expecting then");
-            return null;
-        }
+    <IF> leftExpr = expression() re = relop() rightExpr = expression() <THEN> thenStmt = statement() elseStmt = statement() {
+        if (leftExpr == null || rightExpr == null) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting expression");
+        else if (re == null) throw new CompilerException(CompilationErrorType.EXPECTING_COMPARISON_OPERATOR, this.getLineTrackerumber(), "Expecting relop");
+        else if (thenStmt == null) throw new CompilerException(CompilationErrorType.NO_STATEMENT_IN_THEN_BLOCK, this.getLineTrackerumber(), "Expecting then");
         re.setOperands(leftExpr, rightExpr);
-        return new IfThenTreeNode(re , thenStmt, elseStmt);
+        return new IfThenTreeNode(re, thenStmt, elseStmt);
     }
     |
-    <WHILE> leftExpr = expression() re = relop() rightExpr =  expression() <DO> stmt = statement() <WEND>  {
-        if(leftExpr == null || rightExpr == null) {
-            throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting expression");
-        } else if (re == null) {
-            throw new CompilerException(CompilationErrorType.EXPECTING_COMPARISON_OPERATOR, this.getLineTrackerumber(), "Expecting relop");
-        } else if (stmt == null) {
-            throw new CompilerException(CompilationErrorType.NO_STATEMENT_IN_WHILE_BLOCK, this.getLineTrackerumber(), "Expecting then");
-            return null;
-        }
+    <WHILE> leftExpr = expression() re = relop() rightExpr = expression() <DO> stmt = statement() <WEND> {
+        if (leftExpr == null || rightExpr == null) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting expression");
+        else if (re == null) throw new CompilerException(CompilationErrorType.EXPECTING_COMPARISON_OPERATOR, this.getLineTrackerumber(), "Expecting relop");
+        else if (stmt == null) throw new CompilerException(CompilationErrorType.NO_STATEMENT_IN_WHILE_BLOCK, this.getLineTrackerumber(), "Expecting then");
         re.setOperands(leftExpr, rightExpr);
         return new WhileTreeNode(re, stmt);
     }
-
 }
 
-AbstractComparisonOperatorTreeNode relop() throws ParseException, CompilerException:
-{
-}
+AbstractComparisonOperatorTreeNode relop() throws ParseException, CompilerException: {}
 {
     <DIFF> { return new NotEqualTreeNode(); }
     |
@@ -270,22 +230,19 @@ AbstractComparisonOperatorTreeNode relop() throws ParseException, CompilerExcept
     <GT> { return new GreaterThanTreeNode(); }
 }
 
-AbstractValueTreeNode expression() throws ParseException, CompilerException:
-{
+AbstractValueTreeNode expression() throws ParseException, CompilerException: {
     AbstractValueTreeNode leftOp, expr;
 }
 {
     leftOp = term()
-    expr = expression_end(leftOp)
-    {
+    expr = expression_end(leftOp) {
         if (leftOp == null) throw new CompilerException(CompilationErrorType.EXPECTING_LEFT_OPERAND, this.getLineTrackerumber(), "Expecting a left operand");
         else if (expr == null) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting an expression");
         else return expr;
     }
 }
 
-AbstractValueTreeNode expression_end(AbstractValueTreeNode leftOp) throws ParseException, CompilerException:
-{
+AbstractValueTreeNode expression_end(AbstractValueTreeNode leftOp) throws ParseException, CompilerException: {
     AbstractValueTreeNode rightOp, expr;
 }
 {
@@ -322,23 +279,19 @@ AbstractValueTreeNode expression_end(AbstractValueTreeNode leftOp) throws ParseE
     { return leftOp; }
 }
 
-AbstractValueTreeNode term() throws ParseException, CompilerException:
-{
+AbstractValueTreeNode term() throws ParseException, CompilerException: {
     AbstractValueTreeNode leftOp, term;
 }
 {
     leftOp = factor()
-    term = term_end(leftOp)
-    {
+    term = term_end(leftOp) {
         if (leftOp == null) throw new CompilerException(CompilationErrorType.EXPECTING_LEFT_OPERAND, this.getLineTrackerumber(), "Expecting a left operand");
         else if (term == null) throw new CompilerException(CompilationErrorType.EXPECTING_EXPRESSION, this.getLineTrackerumber(), "Expecting an expression");
         else return term;
     }
 }
 
-// Prirority of the operator
-AbstractValueTreeNode term_end(AbstractValueTreeNode leftOp) throws ParseException, CompilerException:
-{
+AbstractValueTreeNode term_end(AbstractValueTreeNode leftOp) throws ParseException, CompilerException: {
     AbstractValueTreeNode rightOp, term;
 }
 {
@@ -357,8 +310,7 @@ AbstractValueTreeNode term_end(AbstractValueTreeNode leftOp) throws ParseExcepti
     { return leftOp; }
 }
 
-AbstractValueTreeNode factor() throws ParseException, CompilerException:
-{
+AbstractValueTreeNode factor() throws ParseException, CompilerException: {
     AbstractValueTreeNode expr, var;
 }
 {
@@ -378,9 +330,10 @@ AbstractValueTreeNode factor() throws ParseException, CompilerException:
     }
     |
     <STRING> {
-        Token t = jj_consume_token(STRING);
-        return new StringTreeNode(new Value(t.image));
-    }
+    Token t = jj_consume_token(STRING);
+    System.out.println("String token recognized" + t.image);
+    return new StringTreeNode(new Value(t.image));
+}
     |
     <TRUE> {
         jj_consume_token(TRUE);

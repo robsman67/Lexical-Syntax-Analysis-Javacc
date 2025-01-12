@@ -13,45 +13,45 @@ public interface BasicParserConstants {
   /** RegularExpression Id. */
   int CR = 5;
   /** RegularExpression Id. */
-  int NUMBER = 6;
+  int PRINT = 6;
   /** RegularExpression Id. */
-  int OPEN_PARENT = 7;
+  int GOTO = 7;
   /** RegularExpression Id. */
-  int CLOSE_PARENT = 8;
+  int INPUT = 8;
   /** RegularExpression Id. */
-  int PRINT = 9;
+  int LET = 9;
   /** RegularExpression Id. */
-  int GOTO = 10;
+  int RETURN = 10;
   /** RegularExpression Id. */
-  int INPUT = 11;
+  int GOSUB = 11;
   /** RegularExpression Id. */
-  int LET = 12;
+  int END = 12;
   /** RegularExpression Id. */
-  int RETURN = 13;
+  int IF = 13;
   /** RegularExpression Id. */
-  int GOSUB = 14;
+  int THEN = 14;
   /** RegularExpression Id. */
-  int END = 15;
+  int ELSE = 15;
   /** RegularExpression Id. */
-  int IF = 16;
+  int WHILE = 16;
   /** RegularExpression Id. */
-  int THEN = 17;
+  int FOR = 17;
   /** RegularExpression Id. */
-  int ELSE = 18;
+  int TO = 18;
   /** RegularExpression Id. */
-  int WHILE = 19;
+  int STEP = 19;
   /** RegularExpression Id. */
-  int FOR = 20;
+  int NEXT = 20;
   /** RegularExpression Id. */
-  int TO = 21;
+  int DO = 21;
   /** RegularExpression Id. */
-  int STEP = 22;
+  int WEND = 22;
   /** RegularExpression Id. */
-  int NEXT = 23;
+  int NUMBER = 23;
   /** RegularExpression Id. */
-  int DO = 24;
+  int OPEN_PARENT = 24;
   /** RegularExpression Id. */
-  int WEND = 25;
+  int CLOSE_PARENT = 25;
   /** RegularExpression Id. */
   int DIFF = 26;
   /** RegularExpression Id. */
@@ -85,13 +85,11 @@ public interface BasicParserConstants {
   /** RegularExpression Id. */
   int TRUE = 41;
   /** RegularExpression Id. */
-  int COMA = 42;
+  int STRING = 42;
   /** RegularExpression Id. */
-  int STRING = 43;
+  int UNDEF = 43;
   /** RegularExpression Id. */
-  int UNDEF = 44;
-  /** RegularExpression Id. */
-  int IDENTIFIER = 45;
+  int IDENTIFIER = 44;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -104,9 +102,6 @@ public interface BasicParserConstants {
     "\"\\r\"",
     "<token of kind 4>",
     "\"\\n\"",
-    "<NUMBER>",
-    "\"(\"",
-    "\")\"",
     "\"print\"",
     "\"goto\"",
     "\"input\"",
@@ -124,6 +119,9 @@ public interface BasicParserConstants {
     "\"next\"",
     "\"do\"",
     "\"wend\"",
+    "<NUMBER>",
+    "\"(\"",
+    "\")\"",
     "\"<>\"",
     "\"=\"",
     "\"<=\"",
@@ -140,7 +138,6 @@ public interface BasicParserConstants {
     "\"not\"",
     "\"false\"",
     "\"true\"",
-    "\",\"",
     "<STRING>",
     "\"undef\"",
     "<IDENTIFIER>",

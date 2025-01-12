@@ -1,11 +1,16 @@
+/**
+ * @Author: Robert Hakobyan
+ */
+
 package fr.utbm.info.da53.lw2.syntaxtree.binaryOperatorTreeNode;
 
 import fr.utbm.info.da53.lw2.context.ExecutionContext;
+import fr.utbm.info.da53.lw2.error.InterpreterErrorType;
 import fr.utbm.info.da53.lw2.error.InterpreterException;
-import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractBinaryOperatorTreeNode;
 import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractUnaryOperatorTreeNode;
 import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractValueTreeNode;
 import fr.utbm.info.da53.lw2.type.Value;
+import fr.utbm.info.da53.lw2.type.VariableType;
 
 public class BooleanNotTreeNode extends AbstractUnaryOperatorTreeNode {
 
@@ -23,7 +28,11 @@ public class BooleanNotTreeNode extends AbstractUnaryOperatorTreeNode {
      */
     @Override
     protected Value compute(ExecutionContext executionContext, Value operandValue) throws InterpreterException {
-        return null;
+        if(operandValue.getType()!= VariableType.BOOLEAN ){
+            fail(executionContext, InterpreterErrorType.EXPECTING_BOOLEAN);
+        }
+        boolean one = operandValue.getValue(Boolean.class);
+        return new Value(!one);
     }
 
     @Override

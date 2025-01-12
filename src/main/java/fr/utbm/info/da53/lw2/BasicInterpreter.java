@@ -50,7 +50,7 @@ public class BasicInterpreter {
 		BasicParser parser;
 		String filename;
 
-		File f = new File ("./src/test/java/test1.tb");
+		File f = new File ("./src/test/java/mytest.tb");
 
 		try {
 			parser = new BasicParser(new java.io.FileInputStream(f));

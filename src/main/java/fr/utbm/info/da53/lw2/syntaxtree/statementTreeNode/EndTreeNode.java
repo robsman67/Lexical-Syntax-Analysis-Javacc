@@ -1,3 +1,7 @@
+/**
+ * @Author: Robert Hakobyan
+ */
+
 package fr.utbm.info.da53.lw2.syntaxtree.statementTreeNode;
 
 import fr.utbm.info.da53.lw2.context.ExecutionContext;
@@ -20,7 +24,8 @@ public class EndTreeNode extends AbstractStatementTreeNode {
      */
     @Override
     public ExecutionContext run(ExecutionContext context) throws InterpreterException {
-        return null;
+        context.getInterpreter().exit();
+        return context;
     }
 
     @Override

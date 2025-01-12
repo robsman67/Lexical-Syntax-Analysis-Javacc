@@ -1,3 +1,7 @@
+/**
+ * @Author: Robert Hakobyan
+ */
+
 package fr.utbm.info.da53.lw2.syntaxtree.valueTreeNode;
 
 import fr.utbm.info.da53.lw2.context.ExecutionContext;

@@ -1,3 +1,7 @@
+/**
+ * @Author: Robert Hakobyan
+ */
+
 package fr.utbm.info.da53.lw2.syntaxtree.comparaisonTreeNode;
 
 import fr.utbm.info.da53.lw2.syntaxtree.abstractTreeNode.AbstractComparisonOperatorTreeNode;
